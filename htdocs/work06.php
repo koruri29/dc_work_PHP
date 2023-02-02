@@ -9,13 +9,13 @@
 		//work05－1
 			$num = rand(1, 100);
 
-			if ($num % 3 === 0 && $num % 6 === 0) {
+			if ($num % 3 === 0 && $num % 6 === 0):
 				print '3と6の倍数です。';
-			} else if ($num % 3 === 0 && $num % 6 !== 0) {
+			elseif ($num % 3 === 0 && $num % 6 !== 0):
 				print '3の倍数で、6の倍数ではありません';
-			} else {
-				print '倍数ではありません';
-			}
+			else:
+				print '3の倍数で、6の倍数ではありません';
+			endif;
 
 
 			print '<br>';
@@ -27,21 +27,21 @@
 
 			print 'random01 = ' . $random01 . ',random02 = ' . $random02 . 'です。';
 
-			if ($random01 == $random02) {
+			if ($random01 == $random02):
 				print '2つは同じ数です。';
-			} else if ($random01 > $random02) {
+			elseif ($random01 > $random02):
 				print 'random01の方が大きいです。';
-			} else {
+			else:
 				print 'random02の方が大きいです。';
-			}
+			endif;
 
-			if ($random01 % 3 ===0 && $random02 % 3 === 0) {
+			if ($random01 % 3 ===0 && $random02 % 3 === 0):
 				print '2つの数字の中には3の倍数が2つ含まれています。';
-			} else if ($random01 % 3 !== 0 && $random02 % 3 !== 0) {
+			elseif ($random01 % 3 !== 0 && $random02 % 3 !== 0):
 				print '2つの数字の中に3の倍数が含まれていません。';
-			} else {
+			else:
 				print '2つの数字の中には3の倍数が1つ含まれています。';
-			}
+			endif;
 			?>
 	</body>
 </html>
