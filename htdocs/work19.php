@@ -1,15 +1,20 @@
 <?php
+$filename = chmod('work19.txt', 0666);
+$fp = fopen($filename, 'a');
+
 if (! empty($_POST)) {
 	$title = htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8');
 	$text = htmlspecialchars($_POST['text'], ENT_QUOTES, 'UTF-8');
 	
-	$fp = fopen('work19.txt', 'c+');
 	if (empty($title) || empty($text)) {
-		print '入力情報が不足しています。';
+		print '<p>入力情報が不足しています。</p>';
 	} else {
-		fwrite($fp, $title . '：' . $text);
+		fwrite($fp, $title . '：' . $text . "\n");
 	}
 }
+fclose($fp);
+
+$fp = fopen($filename, 'r');
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -28,7 +33,7 @@ if (! empty($_POST)) {
 		<ul>
 			<?php
 			while ($line = fgets($fp)) {
-				print '<li>' . $line . '</li>';
+				echo '<li>' . $line . '</li>';
 			}
 			?>
 		</ul>

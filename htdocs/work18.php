@@ -49,8 +49,8 @@ $page = min($page, $max_page);
 				<?php for ($i = 0; $i < 3; $i++): ?>
 					<tr>
 						<?php if (empty($customers[($page - 1) * 3 + $i])) break; ?>
-						<td><?php print $customers[($page - 1) * 3 + $i]['name'];?></td>
-						<td><?php print $customers[($page - 1) * 3 + $i]['age'];?></td>
+						<td><?php print $customers[($page - 1) * 3 + $i]['name']; ?></td>
+						<td><?php print $customers[($page - 1) * 3 + $i]['age']; ?></td>
 					</tr>
 				<?php endfor; ?>
 			</tbody>
