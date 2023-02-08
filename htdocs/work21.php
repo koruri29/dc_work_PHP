@@ -11,9 +11,9 @@
 			print '<p>正しい入力形式ではありません。</p>';
 			exit();
 		} else {
-			if (preg_match('/.*[dc].*/', $post['dc_check'])) {
+			if (preg_match('/.*dc+.*/', $post['dc_check'])) {
 				print '<p>ディーキャリアが含まれています。</p>';
-			} else if (preg_match('/.*[end]+$/', $post['dc_check'])) {
+			} else if (preg_match('/.*end+$/', $post['dc_check'])) {
 				print '<p>終了です！</p>';
 			}
 		}
@@ -21,8 +21,8 @@
 
 
 	if (!empty($post['phone_number'])) {
-		$pettern = '/^[090]+[-]+[0-9]{4}[-]+[0-9]{4}||^[080]+[-]+[0-9]{4}[-]+[0-9]{4}||^[070]+[-]+[0-9]{4}[-]+[0-9]{4}/';
-		if (! preg_match($pettern, $post['phone_number'])) {
+		$pattern = '/^0[789]0-[0-9]{4}-[0-9]{4}$/';
+		if (! preg_match($pattern, $post['phone_number'])) {
 			print '<p>携帯電話番号の形式ではありません。</p>';
 		}
 	}
