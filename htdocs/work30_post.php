@@ -61,19 +61,19 @@ if (isset($_POST['title']) || isset($_POST['img'])) {
 
 
 }
-	$display = htmlspecialchars($_POST['display'], ENT_QUOTES, 'UTF-8');
-	$image_id = htmlspecialchars($_POST['image_id'], ENT_QUOTES, 'UTF-8');
-	$image_name = htmlspecialchars($_POST['image_name'], ENT_QUOTES, 'UTF-8');
-	//表示・非表示の設定
-	if ($display == '非表示にする') {
-		$update = 'UPDATE photo_submission SET public_flag = 0 WHERE image_id = ' . $image_id;
-		$stmt = $db->query($update);
-		$msg = $image_name . 'を非表示に変更しました。';
-	} else if ($display == '表示する') {
-		$update = 'UPDATE photo_submission SET public_flag = 1 WHERE image_id = ' . $image_id;
-		$stmt = $db->query($update);
-		$msg = $image_name . 'を表示に変更しました。';
-	}
+$display = htmlspecialchars($_POST['display'], ENT_QUOTES, 'UTF-8');
+$image_id = htmlspecialchars($_POST['image_id'], ENT_QUOTES, 'UTF-8');
+$image_name = htmlspecialchars($_POST['image_name'], ENT_QUOTES, 'UTF-8');
+//表示・非表示の設定
+if ($display == '非表示にする') {
+	$update = 'UPDATE photo_submission SET public_flag = 0 WHERE image_id = ' . $image_id;
+	$stmt = $db->query($update);
+	$msg = $image_name . 'を非表示に変更しました。';
+} else if ($display == '表示する') {
+	$update = 'UPDATE photo_submission SET public_flag = 1 WHERE image_id = ' . $image_id;
+	$stmt = $db->query($update);
+	$msg = $image_name . 'を表示に変更しました。';
+}
 ?>
 <!DOCTYPE html>
 <html lang="ja">
