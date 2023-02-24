@@ -15,6 +15,7 @@ function get_connection() {
 		echo $e->getMessage();
 		exit();
 	}
+	// var_dump($pdo);
 	return $pdo;
 }
 
