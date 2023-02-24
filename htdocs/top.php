@@ -2,7 +2,7 @@
 session_start();
 
 define('EXPIRATION_PERIOD', 30);
-$cookie_expiration= time() + EXPIRATION_PERIOD * 60 * 24 * 365;
+$cookie_expiration = time() + EXPIRATION_PERIOD * 60 * 24 * 365;
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -35,7 +35,7 @@ if (! isset($_SESSION['login_id'])) {
 	header('Location: try55.php');
 	exit();
 } else {
-	print '<p>' . $_SESSION['login_id'] . 'さん：ログイン中です。</p>'
+	print '<p>' . $_SESSION['login_id'] . 'さん：ログイン中です。</p>';
 }
 ?>
 <!DOCTYPE html>

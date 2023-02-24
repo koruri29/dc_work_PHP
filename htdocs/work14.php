@@ -7,7 +7,7 @@
 	<body>
 		<?php
 			$arr = array();
-			for ($i = 0; $i < 6; $i++) {
+			for ($i = 0; $i < 5; $i++) {
 				$random = rand(1, 100);
 				array_push($arr, $random);
 			}

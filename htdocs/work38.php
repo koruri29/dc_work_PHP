@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+define('EXPIRATION_PERIOD', 30);
+$cookie_expiration = time() + EXPIRATION_PERIOD * 60 * 24;
+
+
 if ($_SESSION['err_flg']) {
 	print '<p>ログインが失敗しました：正しいログインID（半角英数字）を入力してください。</p>';
 }
@@ -13,46 +17,39 @@ if (isset($_POST['logout'])) {
 	$_SESSION = [];
 
 	if (isset($_COOKIE[$session])) {
-		$params = session_get_cookie_params();
-
 		setcookie($session, '', time() - 30, '/');
 		$message = '<p>ログアウトされました。</p>';
 	}
 } else {
-	if (isset($_SESSION['login_id'])) {
-		header('Location: top.php');
+	if (isset($_SESSION['user_id'])) {
+		header('Location: work38_home.php');
 		exit();
 	}
 }
 
-
-if (isset($_COOKIE['cookie_confirmation']) === true) {
+if (isset($_COOKIE['cookie_confirmation'])) {
 	$cookie_confirmation = 'checked';
 } else {
 	$cookie_confirmation = '';
 }
 
-if (isset($_COOKIE['login_id']) === true) {
-	$login_id = $_COOKIE['login_id'];
+if (isset($_COOKIE['user_id'])) {
+	$user_id = $_COOKIE['user_id'];
 } else {
-	$login_id = '';
+	$user_id = '';
 }
 ?>
 <!DOCTYPE html>
 <html lang="ja">
 	<head>
 		<meta charset="utf-8">
-		<title>TRY55</title>
+		<title>WORK38</title>
 	</head>
 	<body>
-		<?php
-		if (isset($message)) {
-			print $message;
-		}
-		?>
-		<form action="top.php" method="post">
-			<label for="login_id">ログインID</label><input type="text" id="login_id" name="login_id" value="<?php print $login_id; ?>"><br>
-			<input type="checkbox" name="cookie_confirmation" value="checked" <?php print $cookie_check; ?>>次回からログインIDの入力を省略する<br>
+		<form action="work38_home.php" method="post">
+			ユーザーID<input type="number" name="user_id" value="<?php print $user_id; ?>"><br>
+			パスワード<input type="password" name="password"><br>
+			<input type="checkbox" name="cookie_confirmation" value="checked" <?php print $cookie_confirmation; ?>>次回からログインIDの入力を省略する	<br>
 			<input type="submit" value="ログイン">
 		</form>
 	</body>
