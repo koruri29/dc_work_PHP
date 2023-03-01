@@ -26,7 +26,7 @@
 		<a href="work30_view.php">画像一覧ページへ</a>
 		<div class="images">
 			<?php
-				render_img_post($pdo);
+				render_img_post($stmt);
 			?>
 		</div>
 		<script>
