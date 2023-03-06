@@ -1,4 +1,7 @@
 <?php
+session_start();
+session_regenerate_id(true);
+
 require_once ('../../include/model/getDb.php');
 require_once ('../../include/model/common.php');
 require_once ('../../include/model/sqlQuery.php');
@@ -13,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     checkUserThenResister($_POST);
 }
 
-
+include_once ('../../include/view/head.html');
 include_once ('../../include/view/head_register.html');
 include_once ('../../include/view/register.php');
 include_once ('../../include/view/footer.html');

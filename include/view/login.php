@@ -1,7 +1,8 @@
 	<body>
         <a href="register.php">ユーザー登録はこちら</a>
         <h2>ログイン</h2>
-        <form action="/login.php" method="post">
+        <?php if (! empty($error['login'])) print '<p>' . $error['login'] . '</p>'; ?>
+        <form action="./login.php" method="post">
             <dl>
                 <dt>ユーザー名</dt>
                 <dd><input type="text" name="user-name"></dd>

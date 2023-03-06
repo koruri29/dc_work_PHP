@@ -9,7 +9,7 @@ function getSqlResult(object $pdo, string $sql, mixed ...$args): array {
 
 
 /*-------------------------
- * login.php
+ * register.php
  *-------------------------*/
 /**
  * ユーザー登録時、すでに同じユーザー名が登録されていないかチェック
@@ -66,4 +66,28 @@ function insertUser(object $pdo, string $userName, string $password): bool {
         $pdo->commit();
         return true;
     }
+}
+
+
+/*-------------------------
+ * login.php
+ *-------------------------*/
+/**
+ * データベースからユーザー情報を取得する関数
+ * 
+ * @param array $post フォームから投稿された情報
+ * @return array|bool データがあれば配列。なければfalse
+ */
+function fetchUser(array $post) {
+    $post = sanitize($_POST);
+    
+    $pdo = getDb();
+
+    $sql = 'SELECT * FROM EC_user WHERE user_name = :name';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':name', $post['user-name']);
+    $stmt->execute();
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $user;
 }
