@@ -6,7 +6,7 @@
  * @param mixed $before サニタイズしたい値
  * @return mixed $after サニタイズ後の値
  */
-function sanitize(mixed $before) {
+function sanitize($before) {
 	if (is_array($before)) {
 		$after =[];
 		foreach($before as $key=>$val)
