@@ -73,7 +73,7 @@ function validatePassword(string $password): void {
  * ユーザーログイン認証
  * 
  * 認証がOKなら商品一覧（index.php）へ飛ぶ。
- * adminユーザーの場合は商品管理ページ（product.php）へ飛ぶ。
+ * adminユーザー(ID: ec_admin)の場合は商品管理ページ（product.php）へ飛ぶ。
  * 
  * @param array $post フォーム投稿された情報
  * @return void 
@@ -91,6 +91,8 @@ function authUser(array $post): void {
         $error  = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
         return;
     }
+
+    setSession($user);
 
     if ($user['user_name'] == 'ec_admin') {
         header('Location: product.php');

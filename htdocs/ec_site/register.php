@@ -4,8 +4,15 @@ session_regenerate_id(true);
 
 require_once ('../../include/model/ec_getDb.php');
 require_once ('../../include/model/ec_common.php');
-require_once ('../../include/model/ec_sqlQuery.php');
+require_once ('../../include/model/ec_sql_user.php');
 require_once ('../../include/model/ec_user.php');
+require_once ('../../include/model/ec_session.php');
+
+
+if (isLogin($_SESSION)) {
+    header('Location: index.php');
+    exit();
+}
 
 
 $error = array();
@@ -15,6 +22,7 @@ $post = sanitize($_POST);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     checkUserThenResister($_POST);
 }
+
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_register.html');
