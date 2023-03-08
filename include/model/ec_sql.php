@@ -58,7 +58,7 @@ function insertUser(object $pdo, string $userName, string $password): bool {
         return true;
     } catch (PDOException $e) {
         $pdo->rollback();
-        $e->getMessage();
+        echo $e->getMessage();
         return false;
     }
 }
@@ -100,24 +100,24 @@ function fetchUser(array $post) {
  * 
  * @return array $products 商品データ
  */
-function fetchAllProduct() {
-    $pdo = getDb();
+function fetchAllProduct(object $pdo): object {
+    // $pdo = getDb();
 
-    $sql = 'SELECT * FROM EC_product p LEFT JOIN EC_image i ON p.image_id = i.image_id WHERE 1;';
+    $sql = 'SELECT * FROM EC_product p LEFT JOIN EC_image i ON p.image_id = i.image_id WHERE 1 = 1;';
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     
-    $products = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $products;
+    return $stmt;
 }
+
 /**
  * postされた画像ファイルをデータベースへ挿入
  * 
  * @param array $file postされた画像データ
  * @return 
  */
-function insertImage(array $file): array {
-    $pdo = getDb();
+function insertImage(object $pdo, array $file): void {
+    // $pdo = getDb();
 
     try {
         $pdo->beginTransaction();
@@ -130,9 +130,9 @@ function insertImage(array $file): array {
                     updated_at
                 ) VALUES (
                     :name,
-                    :created_at
+                    :created_at,
                     :updated_at
-                )
+                );
         SQL;
 
         $stmt = $pdo->prepare($sql);
@@ -145,11 +145,11 @@ function insertImage(array $file): array {
             $pdo->commit();
         }
 
-        $last_insert_id = lastInsertId();
-        return $last_insert_id;
+        // $last_insert_id = lastInsertId();
+        // return $last_insert_id;
     } catch (PDOException $e) {
         $pdo->rollback();
-        $e->getMessage();
+        echo $e->getMessage();
         exit();
     }
 }
@@ -160,8 +160,8 @@ function insertImage(array $file): array {
  * @param int $last_insert_id 直前にEC_imageへ挿入された画像データのID
  * @return bool 挿入が成功すればtrue
  */
-function insertProduct(array $post, int $last_insert_id):bool {
-    $pdo = getDb();
+function insertProduct(object $pdo, array $post, int $last_insert_id):bool {
+    // $pdo = getDb();
 
     try {
         $pdo->beginTransaction();
@@ -173,6 +173,7 @@ function insertProduct(array $post, int $last_insert_id):bool {
                 price,
                 stock_qty,
                 image_id,
+                public_flag,
                 created_at,
                 updated_at
             ) VALUES (
@@ -180,9 +181,10 @@ function insertProduct(array $post, int $last_insert_id):bool {
                 :price,
                 :qty,
                 :image_id,
-                :created_date,
-                :updated_date
-            )
+                :flag,
+                :created_at,
+                :updated_at
+            );
         SQL;
         
         $stmt = $pdo->prepare($sql);
@@ -191,6 +193,7 @@ function insertProduct(array $post, int $last_insert_id):bool {
         $stmt->bindValue(':price', $post['price']);
         $stmt->bindValue(':qty', $post['qty']);
         $stmt->bindValue(':image_id', $last_insert_id);
+        $stmt->bindValue(':flag', $post['public_flag'], PDO::PARAM_INT);
         $stmt->bindValue(':created_at', $date);
         $stmt->bindValue(':updated_at', $date);
 
@@ -200,7 +203,7 @@ function insertProduct(array $post, int $last_insert_id):bool {
         }
     } catch (PDOException $e) {
         $pdo->rollback();
-        $e->getMessage();
+        echo $e->getMessage();
         exit();
     }
 }
@@ -210,8 +213,8 @@ function insertProduct(array $post, int $last_insert_id):bool {
  * 
  * @return int LAST_INSERT_ID
  */
-function lastInsertId(): int {
-    $pdo = $getDb();
+function lastInsertId(object $pdo): int {
+    // $pdo = $getDb();
 
     $sql = 'SELECT LAST_INSERT_ID()';
     $stmt = $pdo->prepare($sql);
