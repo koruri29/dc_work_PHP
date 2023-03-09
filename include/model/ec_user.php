@@ -7,27 +7,25 @@
  * 登録画面で入力のユーザー情報をチェックする。
  * 問題がなければデータベースに登録する。
  * 
- * @param array $post フォームからのpost
  * @return void 
  */
-function checkUserThenResister(array $post): void {
+function checkUserThenResister(): void {
     global $error;
     global $msg;
     
     $pdo = getDb();
-    $post = sanitize($_POST);
 
-    validateUserName($post['user-name']);
-    validatePassword($post['password']);
+    validateUserName($_POST['user-name']);
+    validatePassword($_POST['password']);
 
     if (! empty($error['user_name']) || ! empty($error['password'])) {
         return;
     }
-    if (isExistingUserName($pdo, $post['user-name'])) {
+    if (isExistingUserName($pdo, $_POST['user-name'])) {
         $error = array_merge($error, ['existing_user_name' => 'すでに登録されているユーザー名です。']);
         return;
     }
-    if (insertUser($pdo, $post['user-name'], $post['password'])) {
+    if (insertUser($pdo, $_POST['user-name'], $_POST['password'])) {
         $msg = array_merge($msg, ['registered' =>'登録が完了しました。']);
     } else {
         $error = array_merge($error, ['register' => '登録に失敗しました。管理者にお問い合わせください。']);
@@ -75,19 +73,18 @@ function validatePassword(string $password): void {
  * 認証がOKなら商品一覧（index.php）へ飛ぶ。
  * adminユーザー(ID: ec_admin)の場合は商品管理ページ（product.php）へ飛ぶ。
  * 
- * @param array $post フォーム投稿された情報
  * @return void 
  */
-function authUser(array $post): void {
+function authUser(object $pdo): void {
     global $error;
 
-    $user = fetchUser($post);
+    $user = fetchUser($pdo);
 
     if ($user == false) {
         $error  = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
         return;
     }
-    if (! password_verify($post['password'], $user['password'])) {
+    if (! password_verify($_POST['password'], $user['password'])) {
         $error  = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
         return;
     }
@@ -98,6 +95,8 @@ function authUser(array $post): void {
         header('Location: product.php');
         exit();
     } else {
+        createCart($pdo);//ログイン時にカートを作成
+        $_SESSION['cart_id'] = lastInsertId($pdo);
         header('Location: index.php');
         exit();   
     }

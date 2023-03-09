@@ -2,7 +2,7 @@
 session_start();
 session_regenerate_id(true);
 
-// if (mkdir('../../include/images', 0644)) {
+// if (mkdir('../../include/images', 0755)) {
 //     print 'フォルダを作成しました。';
 // } else {
 //     print 'フォルダの作成に失敗しました。';
@@ -35,24 +35,24 @@ require_once ('../../include/model/ec_product.php');
 
 
 //ログイン認証
-if (! isLogin($_SESSION) || $_SESSION['id'] != 'ec_admin') {
+if (! isLogin($_SESSION) || $_SESSION['user_name'] != 'ec_admin') {
     header('Location: login.php');
     exit();
 }
 
-
+//商品登録
 $db = getDb();
-
 
 $msg = array();
 $error = array();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    registerProduct($db, $_FILES, $_POST);
+    registerProduct($db);
 }
 
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_product.html');
+include_once ('../../include/view/ec_header.php');
 include_once ('../../include/view/ec_product.php');
 include_once ('../../include/view/ec_footer.html');

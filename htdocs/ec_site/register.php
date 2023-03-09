@@ -16,14 +16,14 @@ if (isLogin($_SESSION)) {
 
 $error = array();
 $msg = array();
-$post = sanitize($_POST);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    checkUserThenResister($_POST);
+    checkUserThenResister();
 }
 
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_register.html');
+include_once ('../../include/view/ec_header.php');
 include_once ('../../include/view/ec_register.php');
 include_once ('../../include/view/ec_footer.html');

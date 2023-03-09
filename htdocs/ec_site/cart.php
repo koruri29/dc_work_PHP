@@ -17,9 +17,15 @@ if (! isLogin($_SESSION)) {
 
 $db = getDb();
 
+function addToCart(object $pdo) {
+    addProductToCart($pdo);
+}
+
+
+
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_index.html');
 include_once ('../../include/view/ec_header.php');
-include_once ('../../include/view/ec_index.php');
+include_once ('../../include/view/ec_cart.php');
 include_once ('../../include/view/ec_footer.html');

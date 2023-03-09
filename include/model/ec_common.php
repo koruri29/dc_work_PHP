@@ -25,13 +25,13 @@ function sanitize($before) {
  * SESSION
  *-------------------------*/
 /**
- * $_SESSIONに値をセット
+ * $_SESSIONにログイン管理に必要な値をセット
  * 
  * @param array $user fetchUser()で取得したユーザー情報
  * @return void
  */
 function setSession(array $user): void {
-    $_SESSION['id'] = $user['user_name'];
+    $_SESSION['user_name'] = $user['user_name'];
     $_SESSION['time'] = time();
 }
 
@@ -41,16 +41,16 @@ function setSession(array $user): void {
  * @param array $session
  * @return bool ログインしていればtrue
  */
-function isLogin(array $session): bool {
-    if (empty($session['id'])) {
+function isLogin(): bool {
+    if (empty($_SESSION['user_name'])) {
         return false;
     }
-    if ($session['time'] + 3600 <= time()) {
-        $session = array();
+    if ($_SESSION['time'] + 3600 <= time()) {
+        $_SESSION = array();
         session_destroy();
         return false;
     }
-    $session['time'] = time();
+    $_SESSION['time'] = time();
     return true;
 }
 //if (isLogin($_SESSION) == false) header('Location: login.php');

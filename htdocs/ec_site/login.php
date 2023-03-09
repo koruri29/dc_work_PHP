@@ -13,15 +13,16 @@ if (isLogin($_SESSION)) {
     exit();
 }
 
-
+$db = getDb();
 $error = array();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    authUser($_POST);
+    authUser($db);//ログイン成功なら同時にカートも作成
 }
 
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_login.html');
+include_once ('../../include/view/ec_header.php');
 include_once ('../../include/view/ec_login.php');
 include_once ('../../include/view/ec_footer.html');
