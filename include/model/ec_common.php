@@ -11,11 +11,11 @@ function sanitize($before) {
 		$after =[];
 		foreach($before as $key=>$val)
 		{
-			$after[$key] = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+			$after[$key] = htmlspecialchars($val, ENT_QUOTES|ENT_HTML5, 'UTF-8');
 		}
 		return $after;
 	} else {
-		$after = htmlspecialchars($before, ENT_QUOTES, 'UTF-8');
+		$after = htmlspecialchars($before, ENT_QUOTES|ENT_HTML5, 'UTF-8');
 		return $after;
 	}
 }
@@ -31,6 +31,7 @@ function sanitize($before) {
  * @return void
  */
 function setSession(array $user): void {
+    $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['user_name'] = $user['user_name'];
     $_SESSION['time'] = time();
 }

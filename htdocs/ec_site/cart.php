@@ -17,9 +17,13 @@ if (! isLogin($_SESSION)) {
 
 $db = getDb();
 
-function addToCart(object $pdo) {
-    addProductToCart($pdo);
-}
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if ($_POST['submit'] == 'カートに入れる') {
+        addToCart($db);
+    } elseif ($_POST['submit'] == '数量変更') {
+        changeQty($db);
+    }
+} 
 
 
 
