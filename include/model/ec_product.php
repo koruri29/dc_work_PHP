@@ -164,9 +164,8 @@ function showPublicProduct(object $pdo) {
  * cart.php
  *-------------------------*/
 function showProductInCart($pdo): void {
-    $stmt = fetchProductInCart($pdo);
+    $stmt = fetchProductsInCart($pdo);
     while (true) {
-        $i = 0;
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($product == false) break;
         $product = sanitize($product);
@@ -176,16 +175,27 @@ function showProductInCart($pdo): void {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>数量：</th><td><input type="number" name="qty' . $i . '" value="' . $product['product_qty'] . '">点</td></tr>';
+        print '<tr><th>数量：</th><td><input type="number" name="qty[]" value="' . $product['product_qty'] . '">点</td></tr>';
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['product_qty'] . '円</td></tr>';
-        print '<tr><th>削除</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
+        print '<tr><th>削除</th><td><input type="checkbox" name="delete[]"></td></tr>';
         print '</table>';
         print '<img src="../../0006/htdocs/img/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '<br>';
         print '<input type="submit" name="submit" value="数量変更">';
         print '</form>';
         print '</div>';
-
-        $i++;
+    }
+}
+/**
+ * カートの商品数を変更する際のバリデーション
+ * 
+ * @param object $pdo
+ * @return bool 
+ */
+function validateQty(object $pdo): bool {
+    $products = sanitize($_POST);
+    foreach ($products as $product) {
+        FetchOneInCart($pdo)
+        if (preg_match('/\A[0-9]+\z/', ));
     }
 }

@@ -348,7 +348,7 @@ function newlyAddToCart($pdo): void {
  * @return void
  */
 function alreadyInCart(object $pdo): void {
-    $stmt = FetchOneProduct($pdo, $_POST['product_id']);
+    $stmt = FetchOneInCart($pdo, $_POST['product_id']);
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
     $max_qty = $product['stock_qty'];
 
@@ -407,7 +407,7 @@ function alreadyInCart(object $pdo): void {
  * @param object $pdo
  * @return object $stmt カート内の商品の情報
  */
-function fetchProductInCart(object $pdo): object {
+function fetchProductsInCart(object $pdo): object {
     try {
         $sql = <<<SQL
             SELECT *
@@ -434,11 +434,40 @@ function fetchProductInCart(object $pdo): object {
  * @param int $product_id 商品ID
  * @return object $stmt 商品情報のデータ
  */
-function FetchOneProduct(object $pdo): object {
-    $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
+function bindIdToSql(object $pdo, string $sql): object {
+    // $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $_POST['product_id']);
     $stmt->execute();
 
     return $stmt;
 }
+/**
+ * カート内から指定の1商品の情報を取得
+ * 
+ * @param object $pdo
+ * @return object
+ */
+function FetchOneInCart(object $pdo) {
+    $sql = 'SELECT * FROM EC_cart_detail WHERE product_id = :id;';
+    return bindIdToSql($pdo, $sql);
+}
+/**
+ * カート内から指定の1商品の情報を取得
+ * 
+ * @param object $pdo
+ * @return object
+ */
+function FetchOneFromProduct(object $pdo) {
+    $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
+    return bindIdToSql($pdo, $sql);
+}
+
+
+/**
+ * 
+ */
+function changeQty(object $pdo) {
+
+}
+
