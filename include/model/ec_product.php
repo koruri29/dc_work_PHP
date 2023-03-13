@@ -181,10 +181,26 @@ function showProductInCart($pdo): void {
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '<br>';
-        print '<input type="submit" name="submit" value="数量変更">';
         print '<input type="hidden" name="product_id" value="' . $product['product_id'] . '">';
+        print '<input type="submit" name="submit" value="数量変更">';
         print '</form>';
         print '</div>';
+    }
+}
+
+
+/**
+ * 商品一覧画面から「カートに入れる」を押した場合の関数
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function addToCart(object $pdo): void {
+    if (doesExistInCart($pdo)) {
+        $qty = getNewQty($pdo, $_POST['product_id']);
+        updateQty($pdo, $_POST['product_id'], $qty);
+    } else {
+        newlyAddToCart($pdo);
     }
 }
 
@@ -196,4 +212,24 @@ function validateQty($qty) {
         return false;
     }
     return true;
+}
+
+/*-------------------------
+ * thankyou.php
+ *-------------------------*/
+function showPurchasedProducts(object $pdo, int $cartId): void {
+    var_dump(getSales($pdo, $cartId));
+    $products = getSales($pdo, $cartId);
+
+    foreach ($products as $product) {
+        print '<div class="item">';
+        print '<table>';
+        print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
+        print '<tr><th>価格：</th><td>' . $product['price'] . '</td></tr>';
+        print '<tr><th>数量</th><td>' . $product['changed_qty'] . '</td></tr>';
+        print '<tr><th>小計</th><td>' . $product['price'] * $product['changed_qty'] . '</td></tr>';
+        print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
+        print '</table>';
+        print '</div>';
+    }    
 }

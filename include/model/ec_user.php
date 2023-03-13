@@ -101,3 +101,20 @@ function authUser(object $pdo): void {
         exit();   
     }
 }
+
+
+/*-------------------------
+ * thankyou.php
+ *-------------------------*/
+/**
+ * 購入完了時、カート内商品を削除し新しいカートを作る
+ *  
+ * @param object $pdo
+ * @return void
+ */
+function restartCart(object $pdo): void {
+
+    clearCart($pdo);
+    createCart($pdo);
+    $_SESSION['cart_id'] = lastInsertId($pdo);
+}

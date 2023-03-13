@@ -2,3 +2,7 @@
 <br>
 <?php
 showProductInCart($db);
+?>
+<form action="./thankyou.php" method="post">
+    <input type="submit" value="購入する">
+</form>
