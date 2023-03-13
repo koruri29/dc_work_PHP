@@ -14,14 +14,13 @@ if (! isLogin($_SESSION)) {
     exit();
 }
 
-
 $db = getDb();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($_POST['submit'] == 'カートに入れる') {
         addToCart($db);
     } elseif ($_POST['submit'] == '数量変更') {
-        changeQty($db);
+        changeQtyInCart($db);
     }
 } 
 

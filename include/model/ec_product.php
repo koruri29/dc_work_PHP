@@ -24,7 +24,7 @@ function showProductData(object $pdo): void {
         print '<tr><th>在庫数：</th><td>' . $product['stock_qty'] . '点</td></tr>';
         print '<tr><th>更新日：</th><td>' . $product['created_at'] . '</td></tr>';
         print '</table>';
-        print '<img src="../../0006/include/images/' . $product['image_name'] . '">';
+        print '<img src="../../0006/images/' . $product['image_name'] . '">';
         print '</div>';
     } 
 }
@@ -45,7 +45,7 @@ function registerProduct(object $pdo): void {
     if (
         move_uploaded_file(
             $_FILES['image']['tmp_name'],
-            '../../include/images/' . $_FILES['image']['name']
+            '../../images/' . $_FILES['image']['name']
         )
     ) {
         //
@@ -100,7 +100,7 @@ function validateProduct(): bool {
         $error = array_merge($error, ['price_empty' => '価格が入力されていません。']);
         $flag = false;
     }
-    if (! is_int($_POST['price'])) {
+    if (! is_numeric($_POST['price'])) {
         $error = array_merge($error, ['price_not_num' => '価格は半角数字で入力してください。']);
         $flag = false;
     }
@@ -112,7 +112,7 @@ function validateProduct(): bool {
         $error = array_merge($error, ['qty_empty' => '在庫数が入力されていません。']);
         $flag = false;
     }
-    if (! is_int($_POST['qty'])) {
+    if (! is_numeric($_POST['qty'])) {
         $error = array_merge($error, ['qty_not_num' => '在庫数は半角数字で入力してください。']);
         $flag = false;
     }
@@ -175,27 +175,25 @@ function showProductInCart($pdo): void {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>数量：</th><td><input type="number" name="qty[]" value="' . $product['product_qty'] . '">点</td></tr>';
+        print '<tr><th>数量：</th><td><input type="number" name="qty" value="' . $product['product_qty'] . '">点</td></tr>';
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['product_qty'] . '円</td></tr>';
-        print '<tr><th>削除</th><td><input type="checkbox" name="delete[]"></td></tr>';
+        print '<tr><th>削除</th><td><input type="checkbox" name="delete"></td></tr>';
         print '</table>';
         print '<img src="../../0006/htdocs/img/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '<br>';
         print '<input type="submit" name="submit" value="数量変更">';
+        print '<input type="hidden" name="product_id" value="' . $product['product_id'] . '">';
         print '</form>';
         print '</div>';
     }
 }
-/**
- * カートの商品数を変更する際のバリデーション
- * 
- * @param object $pdo
- * @return bool 
- */
-function validateQty(object $pdo): bool {
-    $products = sanitize($_POST);
-    foreach ($products as $product) {
-        FetchOneInCart($pdo)
-        if (preg_match('/\A[0-9]+\z/', ));
+
+
+function validateQty($qty) {
+    global $error;
+    if (preg_match('/^[0-9]+$/', $qty) == 0) {
+        $error = array_merge($error, ['character' => '数量は半角数字で入力してください。']);
+        return false;
     }
+    return true;
 }

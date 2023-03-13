@@ -276,28 +276,110 @@ function fetchPublicProduct(object $pdo): object {
 * cart.php
 *-------------------------*/
 /**
- * 商品一覧画面から「カートに入れる」を押した場合
+ * カート内商品詳細（EC_cart_detail）の商品データを取得
+ * 
+ * @param object $pdo
+ * @return object $stmt カート内の商品の情報
+ */
+function fetchProductsInCart(object $pdo): object {
+    try {
+        $sql = <<<SQL
+            SELECT *
+            FROM EC_cart_detail d
+            JOIN EC_product p ON d.product_id = p.product_id
+            JOIN EC_image i ON p.image_id = i.image_id
+            WHERE d.cart_id = :id;
+        SQL;
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':id', $_SESSION['cart_id']);
+        $stmt->execute();
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }   
+    return $stmt;
+}
+
+
+function changeQtyInCart(object $pdo) {
+    $rec = fetchOneInCart($pdo,$_POST['product_id']);
+    $current_qty = $rec['product_qty'];
+
+    if ($_POST['qty'] === $current_qty) {
+        //
+    } else {
+        $qty = getNewQty($pdo, $_POST['product_id'], $_POST['qty']);
+        updateQty($pdo, $_POST['product_id'], $qty);
+    }
+}
+
+
+/**
+ * カート内商品テーブルと在庫数を比べて、適切な数量を設定する
+ * 
+ * @param object $pdo
+ * @param int $id 商品ID
+ * @param int|null $posted_qty 入力された数量。入力がなければnull
+ * @return int $changed_qty 変更したい数量
+ */
+function getNewQty(object $pdo, int $id, $posted_qty = null): int {
+    $product = fetchOneInCart($pdo,$id);
+    $current_qty = $product['product_qty'];
+   
+    $product = fetchOneFromProduct($pdo, $id);
+    $max_qty = $product['stock_qty'];
+
+    if ($posted_qty !== null) {
+        if ($posted_qty >= $max_qty) {
+            $changed_qty = $max_qty;
+        } else {
+            $changed_qty = $posted_qty;
+        }
+        return $changed_qty;
+    }
+
+    if ($current_qty + 1 >= $max_qty) {
+        $changed_qty = $max_qty;
+    } else {
+        $changed_qty = $current_qty + 1;
+    }
+    return $changed_qty;
+}
+
+
+/**
+ * 商品一覧画面から「カートに入れる」を押した場合の関数
  * 
  * @param object $pdo
  * @return void
  */
 function addToCart(object $pdo): void {
-    $sql = 'SELECT product_id FROM EC_cart_detail WHERE 1 = 1;';
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-
-    while (true) {
-        $rec = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($rec == false) {
-            newlyAddToCart($pdo);
-            break;
-        }
-        if ($_POST['product_id'] == $rec['product_id']) {
-            alreadyInCart($pdo);
-            break;
-        }
+    if (doesExistInCart($pdo)) {
+        $qty = getNewQty($pdo, $_POST['product_id']);
+        updateQty($pdo, $_POST['product_id'], $qty);
+    } else {
+        newlyAddToCart($pdo);
     }
 }
+
+/**
+ * 「カートに入れる」ボタン押下時、商品がすでにカートに入っているか判断
+ * 
+ * 該当の商品は$_POST['product_id']で受けることを想定
+ * 
+ * @param object $pdo
+ * @return bool 指定の商品がすでにカートに入っていればtrue
+ */
+function doesExistInCart(object $pdo): bool {
+    $product = FetchOneInCart($pdo, $_POST['product_id']);
+    if ($product['product_id'] !== null) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 /**
  * カートにない商品をカートに入れる場合
  * 
@@ -347,31 +429,9 @@ function newlyAddToCart($pdo): void {
  * @param object $pdo
  * @return void
  */
-function alreadyInCart(object $pdo): void {
-    $stmt = FetchOneInCart($pdo, $_POST['product_id']);
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
-    $max_qty = $product['stock_qty'];
-
+function updateQty(object $pdo, int $id, int $qty): void {
     try {
         $pdo->beginTransaction();
-        //カート内の商品個数を取得
-        $sql = <<<SQL
-            SELECT
-                product_qty
-            FROM
-                EC_cart_detail
-            WHERE
-                cart_id = :cart_id
-            AND
-                product_id = :product_id
-        SQL;
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
-        $stmt->bindValue(':product_id', $_POST['product_id']);
-        $stmt->execute();
-        $rec = $stmt->fetch(PDO::FETCH_ASSOC);
-        $current_qty = $rec['product_qty'];
-    
         $sql = <<<SQL
             UPDATE
                 EC_cart_detail
@@ -379,18 +439,16 @@ function alreadyInCart(object $pdo): void {
                 product_qty = :qty,
                 updated_at = :updated_at
             WHERE
-                product_id = :id;
+                cart_id = :cart_id
+            AND
+                product_id = :product_id;
         SQL;
         $stmt = $pdo->prepare($sql);
-        if ($current_qty >= $max_qty) {
-            $changed_qty = $max_qty;
-        } else {
-            $changed_qty = $current_qty + 1;
-        }
         $date = date('Y-m-d');
-        $stmt->bindValue(':qty', $changed_qty, PDO::PARAM_INT);
+        $stmt->bindValue(':qty', $qty, PDO::PARAM_INT);
         $stmt->bindValue(':updated_at', $date);
-        $stmt->bindValue(':id', $_POST['product_id']);
+        $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
+        $stmt->bindValue(':product_id', $_POST['product_id']);
         $stmt->execute();
 
         $pdo->commit();
@@ -401,73 +459,35 @@ function alreadyInCart(object $pdo): void {
     }
 }
 
+
 /**
- * カート内商品詳細（EC_cart_detail）の商品データを取得
+ * カート内から指定の1商品の情報を取得
  * 
  * @param object $pdo
- * @return object $stmt カート内の商品の情報
+ * @return object $stmt カート内の指定の1商品の情報
  */
-function fetchProductsInCart(object $pdo): object {
-    try {
-        $sql = <<<SQL
-            SELECT *
-            FROM EC_cart_detail d
-            JOIN EC_product p ON d.product_id = p.product_id
-            JOIN EC_image i ON p.image_id = i.image_id
-            WHERE d.cart_id = :id;
-        SQL;
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':id', $_SESSION['cart_id']);
-        $stmt->execute();
-    } catch (PDOException $e) {
-        $pdo->rollback();
-        echo $e->getMessage();
-        exit();
-    }
-    return $stmt;
-}
+function fetchOneInCart(object $pdo, int $id) {
+    $sql = 'SELECT * FROM EC_cart_detail WHERE cart_id = :cart_id AND product_id = :product_id;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
+    $stmt->bindValue(':product_id', $id);
+    $stmt->execute();
 
+    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $rec;
+}
 /**
  * 商品テーブルから指定の1商品の情報を取得
  * 
  * @param object $pdo
- * @param int $product_id 商品ID
- * @return object $stmt 商品情報のデータ
+ * @return $stmt 商品テーブルの指定の1商品の情報
  */
-function bindIdToSql(object $pdo, string $sql): object {
-    // $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
+function fetchOneFromProduct(object $pdo, int $id) {
+    $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':id', $_POST['product_id']);
+    $stmt->bindValue(':id', $id);
     $stmt->execute();
 
-    return $stmt;
+    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $rec;
 }
-/**
- * カート内から指定の1商品の情報を取得
- * 
- * @param object $pdo
- * @return object
- */
-function FetchOneInCart(object $pdo) {
-    $sql = 'SELECT * FROM EC_cart_detail WHERE product_id = :id;';
-    return bindIdToSql($pdo, $sql);
-}
-/**
- * カート内から指定の1商品の情報を取得
- * 
- * @param object $pdo
- * @return object
- */
-function FetchOneFromProduct(object $pdo) {
-    $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
-    return bindIdToSql($pdo, $sql);
-}
-
-
-/**
- * 
- */
-function changeQty(object $pdo) {
-
-}
-
