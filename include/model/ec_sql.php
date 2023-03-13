@@ -163,8 +163,6 @@ function fetchAllProduct(object $pdo): object {
  * @return 
  */
 function insertImage(object $pdo): void {
-    // $pdo = getDb();
-
     try {
         $pdo->beginTransaction();
 
@@ -302,10 +300,14 @@ function fetchProductsInCart(object $pdo): object {
 }
 
 
-function changeQtyInCart(object $pdo) {
+function changeQtyInCart(object $pdo): void {
     $rec = fetchOneInCart($pdo,$_POST['product_id']);
     $current_qty = $rec['product_qty'];
 
+    if (! empty($_POST['delete'])) {
+        deleteProductInCart($pdo);
+        return;
+    }
     if ($_POST['qty'] === $current_qty) {
         //
     } else {
@@ -345,6 +347,26 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
         $changed_qty = $current_qty + 1;
     }
     return $changed_qty;
+}
+
+function deleteProductInCart(object $pdo): void {
+    try {
+        $sql = <<<SQL
+            DELETE FROM
+                EC_cart_detail
+            WHERE
+                cart_id = :cart_id
+            AND
+                product_id = :product_id;
+        SQL;
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
+        $stmt->bindValue(':product_id', $_POST['product_id']);
+        $stmt->execute();
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+        exit();
+    }
 }
 
 

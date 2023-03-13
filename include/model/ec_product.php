@@ -149,7 +149,7 @@ function showPublicProduct(object $pdo) {
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
         print '<tr><th>在庫数：</th><td>' . $product['stock_qty'] . '点</td></tr>';
         print '</table>';
-        print '<img src="../../0006/htdocs/img/' . $product['image_name'] . '">';
+        print '<img src="../../0006/images/' . $product['image_name'] . '">';
         print '<form action="./cart.php" method="post">';
         print '<input type="hidden" name="product_id" value="' . $product['product_id'] . '">';
         //print '<button type="submit">カートに入れる</button>';
@@ -179,7 +179,7 @@ function showProductInCart($pdo): void {
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['product_qty'] . '円</td></tr>';
         print '<tr><th>削除</th><td><input type="checkbox" name="delete"></td></tr>';
         print '</table>';
-        print '<img src="../../0006/htdocs/img/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
+        print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '<br>';
         print '<input type="submit" name="submit" value="数量変更">';
         print '<input type="hidden" name="product_id" value="' . $product['product_id'] . '">';
