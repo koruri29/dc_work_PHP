@@ -21,9 +21,11 @@ $msg = array();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     insertSales($db);
+    // showproducts($db);
     $cart_id = $_SESSION['cart_id'];
     restartCart($db);
 }
+var_dump($cart_id);
 
 
 include_once ('../../include/view/ec_head.html');

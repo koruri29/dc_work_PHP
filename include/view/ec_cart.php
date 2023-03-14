@@ -1,5 +1,6 @@
 <a href="./index.php">商品一覧へ</a>
 <br>
+<h2>カート内商品</h2>
 <?php
 showProductInCart($db);
 ?>

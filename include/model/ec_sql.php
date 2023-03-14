@@ -503,7 +503,7 @@ function fetchOneFromProduct(object $pdo, int $id) {
  * thankyou.php
  *-------------------------*/
 function insertSales(object $pdo) {
-    $stmt = fetchAllInCart($pdo);
+    $rec = fetchAllInCart($pdo);
     
     $sql = <<<SQL
         INSERT INTO
@@ -524,10 +524,7 @@ function insertSales(object $pdo) {
     try {
         $pdo->beginTransaction();
 
-        while (true) {
-            $product = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($product == false) break;
-    
+        while ($product = $rec->fetch(PDO::FETCH_ASSOC)) {    
             $stmt = $pdo->prepare($sql);
             $date = date('Y-m-d');
             $stmt->bindValue(':product_id', $product['product_id']);
@@ -537,8 +534,8 @@ function insertSales(object $pdo) {
             $stmt->bindValue(':updated_at', $date);
             $stmt->execute();
         }
-
         $pdo->commit();
+
     } catch (PDOException $e) {
         $stmt->rollback();
         echo $e->getMessage();
@@ -554,6 +551,8 @@ function fetchAllInCart(object $pdo) {
 
     return $stmt;
 }
+
+
 
 
 /**
@@ -578,7 +577,7 @@ function clearCart(object $pdo): void {
 }
 
 
-function getSales(object $pdo, int $cartId): bool {
+function getSales(object $pdo, int $cartId) {
     $sql = <<<SQL
         SELECT *
         FROM EC_sales_purchases sp
@@ -592,5 +591,5 @@ function getSales(object $pdo, int $cartId): bool {
     $stmt->bindValue(':id', $cartId);
     $stmt->execute();
 
-    return $stmt->fetch(PDO::FETCH_ASSOC);
+    return $stmt;
 }

@@ -218,16 +218,20 @@ function validateQty($qty) {
  * thankyou.php
  *-------------------------*/
 function showPurchasedProducts(object $pdo, int $cartId): void {
-    var_dump(getSales($pdo, $cartId));
-    $products = getSales($pdo, $cartId);
+    $stmt = getSales($pdo, $cartId);
 
-    foreach ($products as $product) {
+    if ($stmt === false) return;
+
+    while (true) {
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($product === false) break;
+
         print '<div class="item">';
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '</td></tr>';
-        print '<tr><th>数量</th><td>' . $product['changed_qty'] . '</td></tr>';
-        print '<tr><th>小計</th><td>' . $product['price'] * $product['changed_qty'] . '</td></tr>';
+        print '<tr><th>数量：</th><td>' . $product['changed_qty'] . '</td></tr>';
+        print '<tr><th>小計：</th><td>' . $product['price'] * $product['changed_qty'] . '</td></tr>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '</table>';
         print '</div>';
