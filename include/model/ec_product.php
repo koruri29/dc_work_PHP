@@ -198,7 +198,7 @@ function showProductInCart($pdo): void {
 function addToCart(object $pdo): void {
     if (doesExistInCart($pdo)) {
         $qty = getNewQty($pdo, $_POST['product_id']);
-        updateQty($pdo, $_POST['product_id'], $qty);
+        updateQty($pdo, $qty);
     } else {
         newlyAddToCart($pdo);
     }
@@ -217,14 +217,23 @@ function validateQty($qty) {
 /*-------------------------
  * thankyou.php
  *-------------------------*/
+function proceedSales(object $pdo) {
+    $stmt = fetchAllInCart($pdo);
+    if ($stmt === false) return;
+
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        if ($product === false) return;
+        insertSales($pdo, $product);
+        changeStock($pdo, $product);
+    }
+}
 function showPurchasedProducts(object $pdo, int $cartId): void {
     $stmt = getSales($pdo, $cartId);
 
     if ($stmt === false) return;
 
-    while (true) {
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($product === false) break;
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $product = sanitize($product);
 
         print '<div class="item">';
         print '<table>';

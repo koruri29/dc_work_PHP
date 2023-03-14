@@ -321,7 +321,7 @@ function changeQtyInCart(object $pdo): void {
  * @return int $changed_qty 変更したい数量
  */
 function getNewQty(object $pdo, int $id, $posted_qty = null): int {
-    $product = fetchOneInCart($pdo,$id);
+    $product = fetchOneInCart($pdo, $id);
     $current_qty = $product['product_qty'];
    
     $product = fetchOneFromProduct($pdo, $id);
@@ -366,7 +366,6 @@ function deleteProductInCart(object $pdo): void {
         exit();
     }
 }
-
 
 
 /**
@@ -502,9 +501,13 @@ function fetchOneFromProduct(object $pdo, int $id) {
 /*-------------------------
  * thankyou.php
  *-------------------------*/
-function insertSales(object $pdo) {
-    $rec = fetchAllInCart($pdo);
-    
+/**
+ * カート内の全商品を売上・仕入テーブルへ登録
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function insertSales(object $pdo, array $product): void {
     $sql = <<<SQL
         INSERT INTO
             EC_sales_purchases (
@@ -523,26 +526,54 @@ function insertSales(object $pdo) {
     SQL;
     try {
         $pdo->beginTransaction();
+  
+        $stmt = $pdo->prepare($sql);
+        $date = date('Y-m-d');
+        $stmt->bindValue(':product_id', $product['product_id']);
+        $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
+        $stmt->bindValue(':qty', $product['product_qty']);
+        $stmt->bindValue(':created_at', $date);
+        $stmt->bindValue(':updated_at', $date);
+        $stmt->execute();
 
-        while ($product = $rec->fetch(PDO::FETCH_ASSOC)) {    
-            $stmt = $pdo->prepare($sql);
-            $date = date('Y-m-d');
-            $stmt->bindValue(':product_id', $product['product_id']);
-            $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
-            $stmt->bindValue(':qty', $product['product_qty']);
-            $stmt->bindValue(':created_at', $date);
-            $stmt->bindValue(':updated_at', $date);
-            $stmt->execute();
-        }
         $pdo->commit();
 
     } catch (PDOException $e) {
-        $stmt->rollback();
+        $pdo->rollback();
         echo $e->getMessage();
         exit();
     }
 }
 
+
+function changeStock(object $pdo, array $product) {
+    $stock = fetchOneFromProduct($pdo, $product['product_id']);
+    $changed_qty = $stock['stock_qty'] - $product['product_qty'];
+
+    $sql = 'UPDATE EC_product SET stock_qty = :qty WHERE product_id = :id;';
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':qty', $changed_qty, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $product['product_id']);
+        $stmt->execute();
+
+        $pdo->commit();
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }
+
+}
+
+/**
+ * カート内商品テーブルから全情報を取得
+ * 
+ * @param object $pdo
+ * @return object $stmt
+ */
 function fetchAllInCart(object $pdo) {
     $sql = 'SELECT * FROM EC_cart_detail WHERE cart_id = :id;';
     $stmt = $pdo->prepare($sql);
@@ -551,8 +582,6 @@ function fetchAllInCart(object $pdo) {
 
     return $stmt;
 }
-
-
 
 
 /**
@@ -576,7 +605,13 @@ function clearCart(object $pdo): void {
     }
 }
 
-
+/**
+ * 売上・仕入テーブルから販売した商品情報を取得
+ * 
+ * @param object $pdo
+ * @param int $cartId カート作成時に付与されたカートID
+ * @return object $stmt
+ */
 function getSales(object $pdo, int $cartId) {
     $sql = <<<SQL
         SELECT *
