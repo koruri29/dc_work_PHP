@@ -18,4 +18,13 @@
         ?>
         <input type="submit" value="登録">
     </form>
-<?php showProductData($db); ?>
+    <p><?php print $msg_update; ?></p>
+    <?php showProductData($db); ?>
+    <script>
+        const item = document.getElementsByClassName('item');
+        const radioBtn = document.getElementsByClassName('radioBtn')
+        const submitBtn = document.getElementsByClassName('submitBtn');
+        for (let i = 0; i < item.length; i++) {
+            if 
+        }
+    </script>

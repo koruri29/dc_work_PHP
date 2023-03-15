@@ -45,9 +45,17 @@ $db = getDb();
 
 $msg = array();
 $error = array();
+$msg_update = '';
+ 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    registerProduct($db);
+    if ($_POST['submit'] == '登録') {
+        registerProduct($db);
+    } else {
+        updateStock($db);
+        updateFlag($db);
+        if (! empty($_POST['delete'])) deleteProduct($db);
+    }
 }
 
 

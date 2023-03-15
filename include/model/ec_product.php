@@ -11,22 +11,47 @@
 function showProductData(object $pdo): void {
     $stmt = fetchAllProduct($pdo);
 
-    while (true) {
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($product == false) break;
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
 
         print '<div class="item">';
+        print '<form action="./product.php" method="post">';
         print '<table>';
         print '<tr><th>商品ID：</th><td>' . $product['product_id'] . '</td></tr>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
-        print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>在庫数：</th><td>' . $product['stock_qty'] . '点</td></tr>';
-        print '<tr><th>更新日：</th><td>' . $product['created_at'] . '</td></tr>';
+        print '<tr><th>価格：</th><td>' . $product['price'] . '</td></tr>';
+        print '<tr>';
+        print '<th>在庫数：</th>';
+        print '<td><input type="text" name="qty" value="' . $product['stock_qty'] . '"></td>';
+        print '</tr>';
+        print '<tr>';
+        print '<th>公開フラグ：</th>';
+        print '<td class="display">';
+        // print '<input class="radioBtn" type="radio" name="display-flag" value="display" checked>表示する';
+        // print '<input class="radioBtn" type="radio" name="display-flag" value="non-display">非表示にする';
+        print '公開中<br>';
+        print '<input class="display-flag" type="checkbox" name="display-flag">設定を変更';
+        print '</td>';
+        print '</tr>';
+        print '<tr><th>削除：</th><td><input type="checkbox" name="delete"></td></tr>';
+        print '<tr><th>更新日：</th><td>' . $product['updated_at'] . '</td></tr>';
+        print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
+        print '<tr><th><input class="submit" type="submit" value="設定を変更する"></th><td></td></tr>';
         print '</table>';
-        print '<img src="../../0006/images/' . $product['image_name'] . '">';
+        print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
+        print '</form>';
         print '</div>';
     } 
+}
+
+function getPublicFlag(object $pdo, int $id) {
+    $sql = 'SELECT public_flag FROM EC_product WHERE product_id = :id;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
+    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $rec['public_flag'];
 }
 
 
@@ -120,8 +145,8 @@ function validateProduct(): bool {
         $error = array_merge($error, ['qty_minus' => '在庫数は正の整数を入力してください。']);
         $flag = false;
     }
-    if (empty($_POST['public_flag'])) {
-        $error = array_merge($error, ['flag_empty' => '公開ステータスが入力されていません']);
+    if ($_POST['public_flag'] === 0 | $_POST['public_flag'] === 1) {
+        $error = array_merge($error, ['flag_empty' => '公開ステータスを選択してください']);
         $flag = false;
     }
 
@@ -227,6 +252,8 @@ function proceedSales(object $pdo) {
         changeStock($pdo, $product);
     }
 }
+
+
 function showPurchasedProducts(object $pdo, int $cartId): void {
     $stmt = getSales($pdo, $cartId);
 

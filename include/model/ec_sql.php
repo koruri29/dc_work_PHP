@@ -193,6 +193,7 @@ function insertImage(object $pdo): void {
         exit();
     }
 }
+
 /**
  * postされた商品情報をデータベースに挿入する
  * 
@@ -247,6 +248,118 @@ function insertProduct(object $pdo, int $last_insert_id):bool {
 }
 
 
+/**
+ * 商品管理画面で、在庫数を変更する
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function updateStock(object $pdo) {
+    global $msg_update;
+    $sql = <<<SQL
+        UPDATE
+            EC_product
+        SET
+            stock_qty = :qty,
+            updated_at = :updated_at
+        WHERE
+            product_id = :id
+    SQL;
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare($sql);
+        $date = date('Y-m-d');
+        $stmt->bindValue(':qty', $_POST['qty']);
+        $stmt->bindValue(':updated_at', $date);
+        $stmt->bindValue(':id', $_POST['product-id']);
+        $stmt->execute();
+        
+        $pdo->commit();
+        
+        if ($stmt->rowCount() > 0) {            
+            $msg_update = '在庫数を更新しました。';
+        }
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }
+}
+
+/**
+ * 商品管理画面で、公開フラグを変更する
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function updateFlag(object $pdo) {
+    global $msg_update;
+    $product = fetchOneFromProduct($pdo, $_POST['product-id']);
+    $flag = $product['public_flag'] === 1 ? 0 : 1;
+    $date = date('Y-m-d');
+
+    $sql = <<<SQL
+        UPDATE
+            EC_product
+        SET
+            public_flag = :flag,
+            updated_at = :updated_at
+        WHERE
+            product_id = :id
+    SQL;
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':flag', $flag);
+        $stmt->bindValue(':updated_at', $date);
+        $stmt->bindValue(':id', $_POST['product-id']);
+        $stmt->execute();
+        
+        $pdo->commit();
+
+        if ($stmt->rowCount() > 0) {            
+            if ($flag === 0) {
+                $msg_update = '非公開に変更しました。';
+                } else {
+                $msg_update = '公開に変更しました。';
+                }
+        }
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }
+}
+
+/**
+ * 商品管理画面で、指定の商品を削除する
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function deleteProduct(object $pdo) {
+    global $msg_update;
+    $sql = 'DELETE FROM EC_product WHERE product_id = :id;';
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':id', $_POST['product-id']);
+        $stmt->execute();
+        
+        $pdo->commit();
+
+        if ($stmt->rowCount() > 0) {            
+            $msg_update = '商品を削除しました。';
+        }
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }
+}
 /*-------------------------
  * index.php
  *-------------------------*/
@@ -485,7 +598,7 @@ function fetchOneInCart(object $pdo, int $id) {
  * 商品テーブルから指定の1商品の情報を取得
  * 
  * @param object $pdo
- * @return $stmt 商品テーブルの指定の1商品の情報
+ * @return array $rec 商品テーブルの指定の1商品の情報
  */
 function fetchOneFromProduct(object $pdo, int $id) {
     $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
@@ -549,13 +662,23 @@ function insertSales(object $pdo, array $product): void {
 function changeStock(object $pdo, array $product) {
     $stock = fetchOneFromProduct($pdo, $product['product_id']);
     $changed_qty = $stock['stock_qty'] - $product['product_qty'];
+    $date = date('Y-m-d');
 
-    $sql = 'UPDATE EC_product SET stock_qty = :qty WHERE product_id = :id;';
+    $sql = <<<SQL
+        UPDATE
+            EC_product
+        SET
+            stock_qty = :qty
+            updated_at = :updated_at
+        WHERE
+            product_id = :id
+    SQL;
     try {
         $pdo->beginTransaction();
 
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':qty', $changed_qty, PDO::PARAM_INT);
+        $stmt->bindValue(':updated_at', $date);
         $stmt->bindValue(':id', $product['product_id']);
         $stmt->execute();
 
