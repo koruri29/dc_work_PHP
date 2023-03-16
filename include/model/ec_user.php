@@ -18,17 +18,15 @@ function checkUserThenResister(): void {
     validateUserName($_POST['user-name']);
     validatePassword($_POST['password']);
 
-    if (! empty($error['user_name']) || ! empty($error['password'])) {
-        return;
-    }
     if (isExistingUserName($pdo, $_POST['user-name'])) {
         $error = array_merge($error, ['existing_user_name' => 'すでに登録されているユーザー名です。']);
-        return;
     }
-    if (insertUser($pdo, $_POST['user-name'], $_POST['password'])) {
-        $msg = array_merge($msg, ['registered' =>'登録が完了しました。']);
-    } else {
-        $error = array_merge($error, ['register' => '登録に失敗しました。管理者にお問い合わせください。']);
+    if (empty($error)) {
+        if (insertUser($pdo, $_POST['user-name'], $_POST['password'])) {
+            $msg = '登録が完了しました。';
+        } else {
+            $error = array_merge($error, ['register' => '登録に失敗しました。管理者にお問い合わせください。']);
+        }
     }
 }
 
@@ -92,12 +90,12 @@ function authUser(object $pdo): void {
     setSession($user);
 
     if ($user['user_name'] == 'ec_admin') {
-        header('Location: product.php');
+        header('Location: edit.php');
         exit();
     } else {
         createCart($pdo);//ログイン時にカートを作成
         $_SESSION['cart_id'] = lastInsertId($pdo);
-        header('Location: index.php');
+        header('Location: product.php');
         exit();   
     }
 }

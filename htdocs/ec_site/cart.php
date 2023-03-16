@@ -10,7 +10,7 @@ require_once ('../../include/model/ec_product.php');
 
 //ログイン認証
 if (! isLogin($_SESSION)) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit();
 }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 include_once ('../../include/view/ec_head.html');
-include_once ('../../include/view/ec_head_index.html');
+include_once ('../../include/view/ec_head_cart.html');
 include_once ('../../include/view/ec_header.php');
 include_once ('../../include/view/ec_cart.php');
 include_once ('../../include/view/ec_footer.html');

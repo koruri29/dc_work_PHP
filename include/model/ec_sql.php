@@ -201,7 +201,7 @@ function insertImage(object $pdo): void {
  * @return bool 挿入が成功すればtrue
  */
 function insertProduct(object $pdo, int $last_insert_id):bool {
-    // $pdo = getDb();
+    global $msg_register;
 
     try {
         $pdo->beginTransaction();
@@ -360,6 +360,24 @@ function deleteProduct(object $pdo) {
         exit();
     }
 }
+
+/**
+ * 公開フラグ情報を取得する
+ * 
+ * @param $pdo
+ * @param int $id 商品ID
+ * @return int 公開フラグ情報（1は公開、0は非公開）
+ */
+function getPublicFlag(object $pdo, int $id): int {
+    $sql = 'SELECT public_flag FROM EC_product WHERE product_id = :id;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':id', $id);
+    $stmt->execute();
+    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $rec['public_flag'];
+}
+
 /*-------------------------
  * index.php
  *-------------------------*/

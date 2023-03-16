@@ -1,4 +1,4 @@
-<a href="./index.php">商品一覧へ</a>
+<a href="./product.php">商品一覧へ</a>
 <br>
 <h2>カート内商品</h2>
 <?php

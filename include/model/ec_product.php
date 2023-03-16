@@ -15,7 +15,7 @@ function showProductData(object $pdo): void {
         $product = sanitize($product);
 
         print '<div class="item">';
-        print '<form action="./product.php" method="post">';
+        print '<form action="./edit.php" method="post">';
         print '<table>';
         print '<tr><th>商品ID：</th><td>' . $product['product_id'] . '</td></tr>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
@@ -29,29 +29,23 @@ function showProductData(object $pdo): void {
         print '<td class="display">';
         // print '<input class="radioBtn" type="radio" name="display-flag" value="display" checked>表示する';
         // print '<input class="radioBtn" type="radio" name="display-flag" value="non-display">非表示にする';
-        print '公開中<br>';
+        if ($product['public_flag'] == 1) {
+            print '公開中です<br>';
+        } else {
+            print'非公開です<br>';
+        }
         print '<input class="display-flag" type="checkbox" name="display-flag">設定を変更';
         print '</td>';
         print '</tr>';
         print '<tr><th>削除：</th><td><input type="checkbox" name="delete"></td></tr>';
         print '<tr><th>更新日：</th><td>' . $product['updated_at'] . '</td></tr>';
         print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
-        print '<tr><th><input class="submit" type="submit" value="設定を変更する"></th><td></td></tr>';
+        print '<tr><th><input class="submit" name="submit" type="submit" value="設定を変更する"></th><td></td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '</form>';
         print '</div>';
     } 
-}
-
-function getPublicFlag(object $pdo, int $id) {
-    $sql = 'SELECT public_flag FROM EC_product WHERE product_id = :id;';
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':id', $id);
-    $stmt->execute();
-    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    return $rec['public_flag'];
 }
 
 
@@ -61,31 +55,42 @@ function getPublicFlag(object $pdo, int $id) {
  * @return bool 登録が成功すればtrue
  */
 function registerProduct(object $pdo): void {
-    global $msg;
+    global $msg_register;
     global $error;
 
-    if (! validateImage()) return;
-    if (! validateProduct()) return;
+    validateImage();
+    validateRegisteredProduct();
 
-    if (
-        move_uploaded_file(
-            $_FILES['image']['tmp_name'],
-            '../../images/' . $_FILES['image']['name']
-        )
-    ) {
-        //
+    if (empty($error)) {
+        if (
+            move_uploaded_file(
+                $_FILES['image']['tmp_name'],
+                '../../images/' . $_FILES['image']['name']
+            )
+        ) {
+            //
+        } else {
+            $error = array_merge($error, ['upload_image' => '画像のアップロードに失敗しました。']);
+        }
     } else {
-        $error = array_merge($error, ['upload_image' => '画像のアップロードに失敗しました。']);
         return;
     }
 
-    insertImage($pdo);
-    $last_insert_id = lastInsertId($pdo);
+    if (empty($error)) {
+        insertImage($pdo);
+        $last_insert_id = lastInsertId($pdo);
+    } else {
+        return;
+    }
 
-    insertProduct($pdo, $last_insert_id);
+    if (insertProduct($pdo, $last_insert_id)) {
+        //
+    } else {
+        $error = array_merge($error, ['insert_product' => '商品の登録に失敗しました。']);
+        return;
+    }
 
-    $msg = array_merge($msg, ['inserted' => '商品の登録が完了しました。']);
-    return;
+    $msg_register = '商品の登録が完了しました。';
 }
 
 /**
@@ -95,7 +100,7 @@ function registerProduct(object $pdo): void {
  */
 function validateImage(): bool {
     global $error;
-    if ($_FILES['img']['size'] === 0) {
+    if ($_FILES['img']['size'] == 0) {
         $error = array_merge($error, ['img' => '画像が選択されていません。']);
         return false;
     }
@@ -109,19 +114,19 @@ function validateImage(): bool {
 }
 
 /**
- * フォームから投稿された商品情報のバリデーションチェック
+ * 商品登録の際のバリデーションチェック
  * 
  * @return bool 未入力や不正な値がなければtrue
  */
-function validateProduct(): bool {
-    global $error;
+function validateProduct(): array {
+    $error = array();
     $flag = true;
     
     if (empty($_POST['name'])) {
         $error = array_merge($error, ['name_empty' => '商品名が入力されていません。']);
         $flag = false;
     }
-    if (empty($_POST['price'])) {
+    if ($_POST['price'] === '') {
         $error = array_merge($error, ['price_empty' => '価格が入力されていません。']);
         $flag = false;
     }
@@ -133,7 +138,7 @@ function validateProduct(): bool {
         $error = array_merge($error, ['price_minus' => '価格は正の整数を入力してください。']);
         $flag = false;
     }
-    if (empty($_POST['qty'])) {
+    if ($_POST['qty'] === '') {
         $error = array_merge($error, ['qty_empty' => '在庫数が入力されていません。']);
         $flag = false;
     }
@@ -151,9 +156,9 @@ function validateProduct(): bool {
     }
 
     if ($flag === true) {
-        return true;
+        return $error;
     } else {
-        return false;
+        return $error;
     }
 }
 
@@ -163,9 +168,7 @@ function validateProduct(): bool {
  *-------------------------*/
 function showPublicProduct(object $pdo) {
     $stmt = fetchPublicProduct($pdo);
-    while (true) {
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($product == false) break;
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
 
         print '<div class="item">';
@@ -178,7 +181,11 @@ function showPublicProduct(object $pdo) {
         print '<form action="./cart.php" method="post">';
         print '<input type="hidden" name="product_id" value="' . $product['product_id'] . '">';
         //print '<button type="submit">カートに入れる</button>';
-        print '<input type="submit" name="submit" value="カートに入れる">';
+        if ($product['stock_qty'] == 0) {
+            print '<p class="sold-out">売り切れ</p>';
+        } else {
+            print '<input type="submit" name="submit" value="カートに入れる">';
+        }
         print '</form>';
         print '</div>';
     }

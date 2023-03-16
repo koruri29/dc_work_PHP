@@ -11,7 +11,7 @@ require_once ('../../include/model/ec_user.php');
 
 //ログイン認証
 if (! isLogin($_SESSION)) {
-    header('Location: login.php');
+    header('Location: index.php');
     exit();
 }
 

@@ -9,13 +9,13 @@ require_once ('../../include/model/ec_user.php');
 
 
 if (isLogin($_SESSION)) {
-    header('Location: index.php');
+    header('Location: product.php');
     exit();
 }
 
 
 $error = array();
-$msg = array();
+$msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     checkUserThenResister();

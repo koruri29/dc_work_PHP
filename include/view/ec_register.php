@@ -1,11 +1,12 @@
 <body>
-	<a href="login.php">ログインはこちら</a>
+	<a href="./index.php">ログインはこちら</a>
 	<h2>ユーザー登録</h2>
-	<?php if (! empty($msg['registered'])) print '<p class="error">' . $msg['registered'] . '</p>'; ?>
-	<?php if (! empty($error['register'])) print '<p class="error">' . $error['register'] . '</p>'; ?>
-	<?php if (! empty($error['user_name'])) print '<p class="error">' . $error['user_name'] . '</p>'; ?>
-	<?php if (! empty($error['existing_user_name'])) print '<p class="error">' . $error['existing_user_name'] . '</p>'; ?>
-	<?php if (! empty($error['password'])) print '<p class="error">' . $error['password'] . '</p>'; ?>
+	<?php if (! empty($msg)) print '<p class="msg">' . $msg . '</p>'; ?>
+	<?php if (! empty($error)) {
+		foreach ($error as $error_msg) {
+			print '<p class="error">' . $error_msg . '</p>';
+		}
+	} ?>
 	<form action="./register.php" method="post">
 		<dl>
 			<dt>ユーザー名</dt>
