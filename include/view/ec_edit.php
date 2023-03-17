@@ -1,6 +1,7 @@
 <body>
     <h3>商品登録</h3>
     <?php if (! empty($msg_register)) print '<p class="msg">' . $msg_register . '</p>'; ?>
+
     <form action="./edit.php" method="post" enctype="multipart/form-data">
         商品名<input type="text" name="name"><br>
         価格<input type="number" name="price"><br>
@@ -19,14 +20,14 @@
         ?>
         <input type="submit" value="登録">
     </form>
-    <?php if (empty($msg_update)) print '<p>' . $msg_update . '</p>'; ?>
+    <?php if (! empty($msg_update)) print '<p class="msg">' . $msg_update . '</p>'; ?>
     <?php
-            if (! empty($error_update)) {
-                foreach ($error_update as $error) {
-                    print '<p class="error">' . $error . '</p>';
-                }
+        if (! empty($error_update)) {
+            foreach ($error_update as $error) {
+                print '<p class="error">' . $error . '</p>';
             }
-        ?>
+        }
+    ?>
     <?php showProductData($db); ?>
     <script>
         const item = document.getElementsByClassName('item');

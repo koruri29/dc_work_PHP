@@ -148,8 +148,6 @@ function createCart(object $pdo): object {
  * @return array $products 商品データ
  */
 function fetchAllProduct(object $pdo): object {
-    // $pdo = getDb();
-
     $sql = 'SELECT * FROM EC_product p LEFT JOIN EC_image i ON p.image_id = i.image_id WHERE 1 = 1;';
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -201,8 +199,6 @@ function insertImage(object $pdo): void {
  * @return bool 挿入が成功すればtrue
  */
 function insertProduct(object $pdo, int $last_insert_id):bool {
-    global $msg_register;
-
     try {
         $pdo->beginTransaction();
 
@@ -254,8 +250,10 @@ function insertProduct(object $pdo, int $last_insert_id):bool {
  * @param object $pdo
  * @return void
  */
-function updateStock(object $pdo) {
+function updateStock(object $pdo): void {
     global $msg_update;
+    $date = date('Y-m-d');
+
     $sql = <<<SQL
         UPDATE
             EC_product
@@ -269,7 +267,6 @@ function updateStock(object $pdo) {
         $pdo->beginTransaction();
 
         $stmt = $pdo->prepare($sql);
-        $date = date('Y-m-d');
         $stmt->bindValue(':qty', $_POST['qty']);
         $stmt->bindValue(':updated_at', $date);
         $stmt->bindValue(':id', $_POST['product-id']);
@@ -293,7 +290,7 @@ function updateStock(object $pdo) {
  * @param object $pdo
  * @return void
  */
-function updateFlag(object $pdo) {
+function updateFlag(object $pdo): void {
     global $msg_update;
     $product = fetchOneFromProduct($pdo, $_POST['product-id']);
     $flag = $product['public_flag'] === 1 ? 0 : 1;
@@ -430,7 +427,7 @@ function changeQtyInCart(object $pdo): void {
     $rec = fetchOneInCart($pdo,$_POST['product_id']);
     $current_qty = $rec['product_qty'];
 
-    if (! empty($_POST['delete'])) {
+    if (($_POST['delete'])) {
         deleteProductInCart($pdo);
         return;
     }
@@ -523,6 +520,7 @@ function doesExistInCart(object $pdo): bool {
  * @return void
  */
 function newlyAddToCart($pdo): void {
+    global $msg;
     try {
         $pdo->beginTransaction();
 
@@ -552,6 +550,7 @@ function newlyAddToCart($pdo): void {
         $stmt->execute();
 
         $pdo->commit();
+        $msg = 'カートに商品を追加しました。';
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
@@ -566,6 +565,7 @@ function newlyAddToCart($pdo): void {
  * @return void
  */
 function updateQty(object $pdo, int $qty): void {
+    global $msg;
     try {
         $pdo->beginTransaction();
         $sql = <<<SQL
@@ -588,6 +588,7 @@ function updateQty(object $pdo, int $qty): void {
         $stmt->execute();
 
         $pdo->commit();
+        $msg = 'カートに商品を追加しました。';
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
@@ -632,19 +633,38 @@ function fetchOneFromProduct(object $pdo, int $id) {
 /*-------------------------
  * thankyou.php
  *-------------------------*/
+function lockTable(object $pdo) {
+    $sql = <<<SQL
+        LOCK TABLES
+            EC_cart_detail WRITE,
+            EC_product WRITE,
+            EC_sales WRITE
+    SQL;
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+}
+
+function unlockTable(object $pdo) {
+    $sql = 'UNLOCK TABLES';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+}
+
+
 /**
  * カート内の全商品を売上・仕入テーブルへ登録
  * 
  * @param object $pdo
+ * @param array $product カート内商品テーブルから取得した商品情報
  * @return void
  */
 function insertSales(object $pdo, array $product): void {
     $sql = <<<SQL
         INSERT INTO
-            EC_sales_purchases (
+            EC_sales (
                 product_id,
                 cart_id,
-                changed_qty,
+                sold_qty,
                 created_at,
                 updated_at
         ) VALUES (
@@ -686,7 +706,7 @@ function changeStock(object $pdo, array $product) {
         UPDATE
             EC_product
         SET
-            stock_qty = :qty
+            stock_qty = :qty,
             updated_at = :updated_at
         WHERE
             product_id = :id
@@ -756,7 +776,7 @@ function clearCart(object $pdo): void {
 function getSales(object $pdo, int $cartId) {
     $sql = <<<SQL
         SELECT *
-        FROM EC_sales_purchases sp
+        FROM EC_sales sp
         LEFT JOIN EC_product p
         ON sp.product_id = p.product_id
         JOIN EC_image i

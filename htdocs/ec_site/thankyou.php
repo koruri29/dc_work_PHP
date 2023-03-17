@@ -20,9 +20,12 @@ $db = getDb();
 $msg = array();
 //LOCK TABLES
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    proceedSales($db);
-    $cart_id = $_SESSION['cart_id'];
-    restartCart($db);
+    $stmt = fetchAllInCart($db);
+    if ($stmt !== false) {
+        proceedSales($db, $stmt);
+        $cart_id = $_SESSION['cart_id'];
+        restartCart($db);
+    }
 }
 
 

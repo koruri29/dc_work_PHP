@@ -2,8 +2,16 @@
 <br>
 <h2>カート内商品</h2>
 <?php
-showProductInCart($db);
+    if (! empty($error)) {
+        foreach ($error as $error_msg) {
+            print '<p class="error">' . $error_msg . '</p>';
+        }
+    }
 ?>
-<form action="./thankyou.php" method="post">
-    <input type="submit" value="購入する">
-</form>
+<?php showProductInCart($db); ?>
+<p>合計金額：<?php print $total; ?>円</p>
+<?php if ($does_show_button): ?>
+    <form action="./thankyou.php" method="post">
+        <input type="submit" value="購入する">
+    </form>
+<?php endif; ?>

@@ -14,18 +14,30 @@ if (! isLogin($_SESSION)) {
     exit();
 }
 
+
 $db = getDb();
 
-$msg = array();
+
+$error = array();
+$msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if ($_POST['submit'] == 'カートに入れる') {
-        addToCart($db);
-    } elseif ($_POST['submit'] == '数量変更') {
+    if (validateQty()) {
         changeQtyInCart($db);
     }
-} 
+}
 
+//合計金額の計算
+$total = calcTotal($db, 'fetchAllInCart');
+
+
+//購入ボタンを表示するか（カートに商品が入っているか）
+$stmt = fetchAllInCart($db);
+if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+    $does_show_button = true;
+} else {
+    $does_show_button = false;
+}
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_cart.html');

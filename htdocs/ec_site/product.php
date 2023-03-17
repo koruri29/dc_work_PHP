@@ -17,6 +17,13 @@ if (! isLogin($_SESSION)) {
 
 $db = getDb();
 
+$msg = '';
+var_dump($_SESSION['cart_id']);
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    addToCart($db);
+} 
+
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_product.html');

@@ -44,6 +44,8 @@ if (! isLogin($_SESSION) || $_SESSION['user_name'] != 'ec_admin') {
 $db = getDb();
 
 
+$error_register = array();
+$error_update = array();
 $msg_register = '';
 $msg_update = '';
  
@@ -52,12 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['register'])) {
         registerProduct($db);
     } else {
-        $error_update = validateProduct();
-        if (empty($error_update)) {
-            updateStock($db);
-            if ($_POST['display-flag']) updateFlag($db);
-            if (! empty($_POST['delete'])) deleteProduct($db);
-        }
+        proceedUpdateProduct($db);
     }
 }
 
