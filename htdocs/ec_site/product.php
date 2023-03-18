@@ -17,8 +17,8 @@ if (! isLogin($_SESSION)) {
 
 $db = getDb();
 
+
 $msg = '';
-var_dump($_SESSION['cart_id']);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     addToCart($db);

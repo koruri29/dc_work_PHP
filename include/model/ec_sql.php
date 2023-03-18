@@ -471,7 +471,6 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
    
     $product = fetchOneFromProduct($pdo, $id);
     $max_qty = $product['qty'];
-
     if ($posted_qty !== null) {
         if ($posted_qty >= $max_qty) {
             $changed_qty = $max_qty;

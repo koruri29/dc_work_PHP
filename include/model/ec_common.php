@@ -54,4 +54,3 @@ function isLogin(): bool {
     $_SESSION['time'] = time();
     return true;
 }
-//if (isLogin($_SESSION) == false) header('Location: login.php');

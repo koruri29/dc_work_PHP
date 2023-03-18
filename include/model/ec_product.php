@@ -212,7 +212,7 @@ function validateUpdatedProduct(): bool {
 
 
 /*-------------------------
- * index.php
+ * product.php
  *-------------------------*/
 function showPublicProduct(object $pdo) {
     $stmt = fetchPublicProduct($pdo);
@@ -239,6 +239,15 @@ function showPublicProduct(object $pdo) {
     }
 }
 
+
+function countTotalProduct(object $pdo) : int {
+    $stmt = fetchAllInCart($pdo);
+    $total = 0;
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $total += $product['qty'];
+    }
+    return $total;
+}
 
 /*-------------------------
  * cart.php
@@ -304,7 +313,7 @@ function calcTotal(object $pdo, callable $funk): int {
 function addToCart(object $pdo): void {
     if (doesExistInCart($pdo)) {
         $qty = getNewQty($pdo, $_POST['product-id']);
-        updateQty($pdo, $qty, $_POST['product-id']);
+        updateQty($pdo, $_POST['product-id'], $qty);
     } else {
         newlyAddToCart($pdo);
     }
