@@ -423,19 +423,31 @@ function fetchProductsInCart(object $pdo): object {
 }
 
 
-function changeQtyInCart(object $pdo): void {
-    $rec = fetchOneInCart($pdo,$_POST['product_id']);
-    $current_qty = $rec['product_qty'];
+function countProductInCart(object $pdo): int {
+    $sql = 'SELECT count(*) AS cnt FROM EC_cart_detail WHERE cart_id = :id;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':id', $_SESSION['cart_id']);
+    $stmt->execute();
+    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (($_POST['delete'])) {
-        deleteProductInCart($pdo);
-        return;
-    }
-    if ($_POST['qty'] === $current_qty) {
-        //
-    } else {
-        $qty = getNewQty($pdo, $_POST['product_id'], $_POST['qty']);
-        updateQty($pdo, $qty);
+    return $rec['cnt'];
+}
+
+
+function changeQtyInCart(object $pdo): void {
+    for ($i = 0; $i < $_POST['product-num']; $i++) {
+        $rec = fetchOneInCart($pdo, $_POST['product-id' . $i]);
+        $current_qty = $rec['product_qty'];
+    
+        if (($_POST['delete' . $i])) {
+            deleteProductInCart($pdo, $_POST['product-id' . $i]);
+        }
+        if ($_POST['qty' . $i] === $current_qty) {
+            //
+        } else {
+            $qty = getNewQty($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);
+            updateQty($pdo, $qty, $_POST['product-id' . $i]);
+        }
     }
 }
 
@@ -472,7 +484,7 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
     return $changed_qty;
 }
 
-function deleteProductInCart(object $pdo): void {
+function deleteProductInCart(object $pdo, int $id): void {
     try {
         $pdo->beginTransaction();
         $sql = <<<SQL
@@ -485,7 +497,7 @@ function deleteProductInCart(object $pdo): void {
         SQL;
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
-        $stmt->bindValue(':product_id', $_POST['product_id']);
+        $stmt->bindValue(':product_id', $id);
         $stmt->execute();
         $pdo->commit();
     } catch (PDOException $e) {
@@ -564,7 +576,7 @@ function newlyAddToCart($pdo): void {
  * @param object $pdo
  * @return void
  */
-function updateQty(object $pdo, int $qty): void {
+function updateQty(object $pdo, int $qty, int $id): void {
     global $msg;
     try {
         $pdo->beginTransaction();
@@ -584,7 +596,7 @@ function updateQty(object $pdo, int $qty): void {
         $stmt->bindValue(':qty', $qty, PDO::PARAM_INT);
         $stmt->bindValue(':updated_at', $date);
         $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
-        $stmt->bindValue(':product_id', $_POST['product_id']);
+        $stmt->bindValue(':product_id', $id);
         $stmt->execute();
 
         $pdo->commit();
@@ -613,6 +625,7 @@ function fetchOneInCart(object $pdo, int $id) {
     $rec = $stmt->fetch(PDO::FETCH_ASSOC);
     return $rec;
 }
+
 /**
  * 商品テーブルから指定の1商品の情報を取得
  * 

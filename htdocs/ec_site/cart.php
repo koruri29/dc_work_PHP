@@ -21,11 +21,18 @@ $db = getDb();
 $error = array();
 $msg = '';
 
+//カート内商品の個数
+$product_num = countProductInCart($db);
+var_dump($product_num);
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (validateQty()) {
         changeQtyInCart($db);
     }
 }
+
+
+
 
 //合計金額の計算
 $total = calcTotal($db, 'fetchAllInCart');

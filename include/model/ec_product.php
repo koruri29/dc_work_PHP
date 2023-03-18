@@ -245,24 +245,24 @@ function showPublicProduct(object $pdo) {
  *-------------------------*/
 function showProductInCart($pdo): void {
     $stmt = fetchProductsInCart($pdo);
+    $i = 0;
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
 
         print '<div class="item">';
-        print '<form action="./cart.php" method="post">';
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>数量：</th><td><input type="number" name="qty" value="' . $product['product_qty'] . '">点</td></tr>';
+        print '<tr><th>数量：</th><td><input type="number" name="qty' . $i . '" value="' . $product['product_qty'] . '">点</td></tr>';
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['product_qty'] . '円</td></tr>';
-        print '<tr><th>削除</th><td><input type="checkbox" name="delete"></td></tr>';
+        print '<tr><th>削除</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '<br>';
-        print '<input type="hidden" name="product_id" value="' . $product['product_id'] . '">';
-        print '<input type="submit" name="submit" value="数量変更">';
-        print '</form>';
+        print '<input type="hidden" name="product-id' . $i . '" value="' . $product['product_id'] . '">';
         print '</div>';
+        
+        $i++;
     }
 }
 
@@ -304,17 +304,19 @@ function validateQty() {
 
     $flag = true;
     
-    if ($_POST['qty'] === '') {
-        $error = array_merge($error, ['qty_empty' => '数量が入力されていません。']);
-        $flag = false;
-    }
-    if (! is_numeric($_POST['qty'])) {
-        $error = array_merge($error, ['qty_not_num' => '数量は半角数字で入力してください。']);
-        $flag = false;
-    }
-    if ($_POST['qty'] < 0) {
-        $error = array_merge($error, ['qty_minus' => '数量は正の整数で入力してください。']);
-        $flag = false;
+    for ($i = 0; $i < $_POST['product_num']; $i++) {
+        if ($_POST['qty' . $i] === '') {
+            $error = array_merge($error, ['qty_empty' => '数量が入力されていません。']);
+            $flag = false;
+        }
+        if (! is_numeric($_POST['qty' . $i])) {
+            $error = array_merge($error, ['qty_not_num' => '数量は半角数字で入力してください。']);
+            $flag = false;
+        }
+        if ($_POST['qty' . $i] < 0) {
+            $error = array_merge($error, ['qty_minus' => '数量は正の整数で入力してください。']);
+            $flag = false;
+        }
     }
 
     if ($flag === true) {
