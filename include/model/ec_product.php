@@ -1,11 +1,12 @@
 <?php
 
 /*-------------------------
- * product.php
+ * edit.php
  *-------------------------*/
 /**
  * 商品管理画面で商品データを一覧表示する
  * 
+ * @param object $pdo
  * @return void
  */
 function showProductData(object $pdo): void {
@@ -48,6 +49,13 @@ function showProductData(object $pdo): void {
     } 
 }
 
+
+/**
+ * 商品管理画面での更新機能をまとめた関数
+ * 
+ * @param object $pdo
+ * @return void
+ */
 function proceedUpdateProduct(object $pdo): void {
     if (! validateUpdatedProduct()) return;
 
@@ -61,6 +69,7 @@ function proceedUpdateProduct(object $pdo): void {
         return;
     }
 }
+
 /**
  * 画像と商品データの登録
  * 
@@ -214,7 +223,13 @@ function validateUpdatedProduct(): bool {
 /*-------------------------
  * product.php
  *-------------------------*/
-function showPublicProduct(object $pdo) {
+/**
+ * 商品一覧画面で、公開中の商品すべてを表示する関数
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function showPublicProduct(object $pdo): void {
     $stmt = fetchPublicProduct($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
@@ -240,19 +255,25 @@ function showPublicProduct(object $pdo) {
 }
 
 
-function countTotalProduct(object $pdo) : int {
-    $stmt = fetchAllInCart($pdo);
-    $total = 0;
-    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $total += $product['qty'];
-    }
-    return $total;
-}
+// function countTotalProduct(object $pdo) : int {
+//     $stmt = fetchAllInCart($pdo);
+//     $total = 0;
+//     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+//         $total += $product['qty'];
+//     }
+//     return $total;
+// }
 
 /*-------------------------
  * cart.php
  *-------------------------*/
-function showProductInCart($pdo): void {
+/**
+ * カート内商品を一覧化する関数
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function showProductInCart(object $pdo): void {
     $stmt = fetchProductsInCart($pdo);
     $i = 0;
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -276,7 +297,13 @@ function showProductInCart($pdo): void {
 }
 
 
-function isStockAvailable(object $pdo) {
+/**
+ * カート内の商品が売り切れたときのエラー表示
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function isStockAvailable(object $pdo): void {
     global $error;
     $stmt = fetchAllInCart($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -292,6 +319,7 @@ function isStockAvailable(object $pdo) {
  * 合計金額の計算
  * 
  * @param object $pdo
+ * @param calldable $funk データベースから商品郡を取得する関数
  * @return int $total 合計金額
  */
 function calcTotal(object $pdo, callable $funk): int {
@@ -320,7 +348,12 @@ function addToCart(object $pdo): void {
 }
 
 
-function validateQty() {
+/** 
+ * カート内商品の数量変更の際のバリデーション
+ * 
+ * @return bool
+*/
+function validateQty(): bool {
     global $error;
     global $product_num;
 
@@ -351,7 +384,14 @@ function validateQty() {
 /*-------------------------
  * thankyou.php
  *-------------------------*/
-function proceedSales(object $pdo, object $stmt) {
+/**
+ * 商品決済を進める関数
+ * 
+ * @param object $pdo
+ * @param object $stmt カート内商品テーブルのデータ
+ * @return void
+ */
+function proceedSales(object $pdo, object $stmt): void {
     lockTable($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         insertSales($pdo, $product);
@@ -362,11 +402,12 @@ function proceedSales(object $pdo, object $stmt) {
 
 
 /**
- * 
+ * 購入完了した商品の一覧表示
  * 
  * @param $stmt getSalesの返り値
+ * @return void
  */
-function showPurchasedProducts(object $pdo, object $stmt): void {
+function showPurchasedProducts(object $stmt): void {
     if ($stmt === false) return;
 
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {

@@ -39,7 +39,6 @@ function setSession(array $user): void {
 /**
  * $_SESSIONにログイン情報が保存されているかチェック
  * 
- * @param array $session
  * @return bool ログインしていればtrue
  */
 function isLogin(): bool {

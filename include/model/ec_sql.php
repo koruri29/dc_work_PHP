@@ -1,19 +1,11 @@
 <?php
-
-function getSqlResult(object $pdo, string $sql, mixed ...$args): array {
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $rec;
-}
-
-
 /*-------------------------
  * common
  *-------------------------*/
 /**
  * LAST_INSERT_IDを取得する
  * 
+ * @param object $pdo
  * @return int LAST_INSERT_ID
  */
 function lastInsertId(object $pdo): int {
@@ -32,8 +24,7 @@ function lastInsertId(object $pdo): int {
  * ユーザー登録時、すでに同じユーザー名が登録されていないかチェック
  * 
  * @param object $pdo
- * @param string $userName
- * @return bool 重複があればtrue
+ * @return bool すでに登録があればtrue
  */
 function isExistingUserName(object $pdo): bool {
     $sql = 'SELECT COUNT(*) AS cnt FROM EC_user WHERE user_name = :name;';
@@ -52,8 +43,6 @@ function isExistingUserName(object $pdo): bool {
  * データベースへユーザーを登録する関数
  * 
  * @param object $pdo
- * @param string $userName
- * @param string $password
  * @return bool 登録が成功すればtrue
  */
 function insertUser(object $pdo): bool {
@@ -87,6 +76,7 @@ function insertUser(object $pdo): bool {
 /**
  * データベースからユーザー情報を取得する関数
  * 
+ * @param object $pdo
  * @return array|bool データがあれば配列。なければfalse
  */
 function fetchUser(object $pdo) {
@@ -104,9 +94,9 @@ function fetchUser(object $pdo) {
  * カートIDを作成
  * 
  * @param object $pdo
- * 
+ * @return void
  */
-function createCart(object $pdo): object {
+function createCart(object $pdo): void {
     try {
         $pdo->beginTransaction();
 
@@ -130,7 +120,6 @@ function createCart(object $pdo): object {
         $stmt->execute();
         
         $pdo->commit();
-        return $stmt;
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
@@ -140,12 +129,13 @@ function createCart(object $pdo): object {
 
 
 /*-------------------------
- * product.php
+ * edit.php
  *-------------------------*/
 /**
  * データベースからすべての商品データを取得
  * 
- * @return array $products 商品データ
+ * @param object $pdo
+ * @return object $products 商品データ
  */
 function fetchAllProduct(object $pdo): object {
     $sql = 'SELECT * FROM EC_product p LEFT JOIN EC_image i ON p.image_id = i.image_id WHERE 1 = 1;';
@@ -158,7 +148,8 @@ function fetchAllProduct(object $pdo): object {
 /**
  * postされた画像ファイルをデータベースへ挿入
  * 
- * @return 
+ * @param object $pdo
+ * @return void
  */
 function insertImage(object $pdo): void {
     try {
@@ -195,6 +186,7 @@ function insertImage(object $pdo): void {
 /**
  * postされた商品情報をデータベースに挿入する
  * 
+ * @param object $pdo
  * @param int $last_insert_id 直前にEC_imageへ挿入された画像データのID
  * @return bool 挿入が成功すればtrue
  */
@@ -336,7 +328,7 @@ function updateFlag(object $pdo): void {
  * @param object $pdo
  * @return void
  */
-function deleteProduct(object $pdo) {
+function deleteProduct(object $pdo): void {
     global $msg_update;
     $sql = 'DELETE FROM EC_product WHERE product_id = :id;';
     try {
@@ -376,7 +368,7 @@ function getPublicFlag(object $pdo, int $id): int {
 }
 
 /*-------------------------
- * index.php
+ * product.php
  *-------------------------*/
 /**
  * データベースから公開フラグが「公開」の商品情報を取得する
@@ -428,6 +420,14 @@ function fetchProductsInCart(object $pdo): object {
 }
 
 
+/**
+ * カート内の商品の種類数をカウント
+ * 
+ * カート内の商品数変更フォームで、配列の数を数えるための関数
+ * 
+ * @param object $pdo
+ * @return int 配列が何番目まであるかの数字
+ */
 function countProductInCart(object $pdo): int {
     $sql = 'SELECT count(*) AS cnt FROM EC_cart_detail WHERE cart_id = :id;';
     $stmt = $pdo->prepare($sql);
@@ -439,6 +439,12 @@ function countProductInCart(object $pdo): int {
 }
 
 
+/**
+ * カート内の商品の数量変更または削除の関数
+ * 
+ * @param object $pdo
+ * @return void
+ */
 function changeQtyInCart(object $pdo): void {
     for ($i = 0; $i < $_POST['product-num']; $i++) {
         $rec = fetchOneInCart($pdo, $_POST['product-id' . $i]);
@@ -488,6 +494,13 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
     return $changed_qty;
 }
 
+/**
+ * カート内の商品を削除する関数
+ * 
+ * @param object $pdo
+ * @param int $id 商品ID
+ * @return void
+ */
 function deleteProductInCart(object $pdo, int $id): void {
     try {
         $pdo->beginTransaction();
@@ -535,7 +548,7 @@ function doesExistInCart(object $pdo): bool {
  * @param object $pdo
  * @return void
  */
-function newlyAddToCart($pdo): void {
+function newlyAddToCart(object $pdo): void {
     global $msg;
     try {
         $pdo->beginTransaction();
@@ -577,7 +590,9 @@ function newlyAddToCart($pdo): void {
 /**
  * カート内の商品数を変更する
  * 
- * @param object $pdo
+ * @param object $
+ * @param int $id 商品ID
+ * @param int $qty 変更したい商品数量
  * @return void
  */
 function updateQty(object $pdo, int $id, int $qty): void {
@@ -634,9 +649,10 @@ function fetchOneInCart(object $pdo, int $id) {
  * 商品テーブルから指定の1商品の情報を取得
  * 
  * @param object $pdo
+ * @param int $id 取得したい商品ID
  * @return array $rec 商品テーブルの指定の1商品の情報
  */
-function fetchOneFromProduct(object $pdo, int $id) {
+function fetchOneFromProduct(object $pdo, int $id): array {
     $sql = 'SELECT * FROM EC_product WHERE product_id = :id;';
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $id);
@@ -650,7 +666,13 @@ function fetchOneFromProduct(object $pdo, int $id) {
 /*-------------------------
  * thankyou.php
  *-------------------------*/
-function lockTable(object $pdo) {
+/**
+ * 編集中のテーブルにロックをかける
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function lockTable(object $pdo): void {
     $sql = <<<SQL
         LOCK TABLES
             EC_cart_detail WRITE,
@@ -661,7 +683,13 @@ function lockTable(object $pdo) {
     $stmt->execute();
 }
 
-function unlockTable(object $pdo) {
+/**
+ * テーブルにかけたロックを外す
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function unlockTable(object $pdo): void {
     $sql = 'UNLOCK TABLES';
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -714,7 +742,14 @@ function insertSales(object $pdo, array $product): void {
 }
 
 
-function changeStock(object $pdo, array $product) {
+/**
+ * 商品決済の際、商品テーブルから売れた分の在庫数を減らす
+ * 
+ * @param object $pdo
+ * @param array $product
+ * @return void
+ */
+function changeStock(object $pdo, array $product) : void{
     $stock = fetchOneFromProduct($pdo, $product['product_id']);
     $changed_qty = $stock['qty'] - $product['qty'];
     $date = date('Y-m-d');
@@ -750,7 +785,7 @@ function changeStock(object $pdo, array $product) {
  * カート内商品テーブルから全情報を取得
  * 
  * @param object $pdo
- * @return object $stmt
+ * @return object|null $stmt
  */
 function fetchAllInCart(object $pdo) {
     $sql = 'SELECT * FROM EC_cart_detail WHERE cart_id = :id;';
@@ -787,7 +822,6 @@ function clearCart(object $pdo): void {
  * 売上・仕入テーブルから販売した商品情報を取得
  * 
  * @param object $pdo
- * @param int $cartId カート作成時に付与されたカートID
  * @return object $stmt
  */
 function getSales(object $pdo): object {

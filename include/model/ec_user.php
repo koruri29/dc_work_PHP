@@ -71,6 +71,7 @@ function validatePassword(string $password): void {
  * 認証がOKなら商品一覧（index.php）へ飛ぶ。
  * adminユーザー(ID: ec_admin)の場合は商品管理ページ（product.php）へ飛ぶ。
  * 
+ * @param object $pdo
  * @return void 
  */
 function authUser(object $pdo): void {
