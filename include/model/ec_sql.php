@@ -207,7 +207,7 @@ function insertProduct(object $pdo, int $last_insert_id):bool {
             EC_product (
                 product_name,
                 price,
-                stock_qty,
+                qty,
                 image_id,
                 public_flag,
                 created_at,
@@ -258,7 +258,7 @@ function updateStock(object $pdo): void {
         UPDATE
             EC_product
         SET
-            stock_qty = :qty,
+            qty = :qty,
             updated_at = :updated_at
         WHERE
             product_id = :id
@@ -409,7 +409,12 @@ function fetchPublicProduct(object $pdo): object {
  */
 function fetchProductsInCart(object $pdo): object {
     $sql = <<<SQL
-        SELECT *
+        SELECT 
+            p.product_name,
+            p.price,
+            d.qty,
+            i.image_name,
+            p.product_id
         FROM EC_cart_detail d
         JOIN EC_product p ON d.product_id = p.product_id
         JOIN EC_image i ON p.image_id = i.image_id
@@ -437,16 +442,16 @@ function countProductInCart(object $pdo): int {
 function changeQtyInCart(object $pdo): void {
     for ($i = 0; $i < $_POST['product-num']; $i++) {
         $rec = fetchOneInCart($pdo, $_POST['product-id' . $i]);
-        $current_qty = $rec['product_qty'];
+        $current_qty = $rec['qty'];
     
         if (($_POST['delete' . $i])) {
             deleteProductInCart($pdo, $_POST['product-id' . $i]);
         }
-        if ($_POST['qty' . $i] === $current_qty) {
+        if ($_POST['qty' . $i] === $current_qty) {  
             //
         } else {
             $qty = getNewQty($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);
-            updateQty($pdo, $qty, $_POST['product-id' . $i]);
+            updateQty($pdo, $_POST['product-id' . $i], $qty);
         }
     }
 }
@@ -462,10 +467,10 @@ function changeQtyInCart(object $pdo): void {
  */
 function getNewQty(object $pdo, int $id, $posted_qty = null): int {
     $product = fetchOneInCart($pdo, $id);
-    $current_qty = $product['product_qty'];
+    $current_qty = $product['qty'];
    
     $product = fetchOneFromProduct($pdo, $id);
-    $max_qty = $product['stock_qty'];
+    $max_qty = $product['qty'];
 
     if ($posted_qty !== null) {
         if ($posted_qty >= $max_qty) {
@@ -511,13 +516,13 @@ function deleteProductInCart(object $pdo, int $id): void {
 /**
  * 「カートに入れる」ボタン押下時、商品がすでにカートに入っているか判断
  * 
- * 該当の商品は$_POST['product_id']で受けることを想定
+ * 該当の商品は$_POST['product-id']で受けることを想定
  * 
  * @param object $pdo
  * @return bool 指定の商品がすでにカートに入っていればtrue
  */
 function doesExistInCart(object $pdo): bool {
-    $product = FetchOneInCart($pdo, $_POST['product_id']);
+    $product = FetchOneInCart($pdo, $_POST['product-id']);
     if ($product['product_id'] !== null) {
         return true;
     } else {
@@ -541,7 +546,7 @@ function newlyAddToCart($pdo): void {
                 EC_cart_detail (
                     cart_id,
                     product_id,
-                    product_qty,
+                    qty,
                     created_at,
                     updated_at
             ) VALUES (
@@ -555,7 +560,7 @@ function newlyAddToCart($pdo): void {
         $stmt = $pdo->prepare($sql);
         $date = date('Y-m-d');
         $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
-        $stmt->bindValue(':product_id', $_POST['product_id']);
+        $stmt->bindValue(':product_id', $_POST['product-id']);
         $stmt->bindValue(':qty', 1, PDO::PARAM_INT);
         $stmt->bindValue(':created_at', $date);
         $stmt->bindValue(':updated_at', $date);
@@ -576,7 +581,7 @@ function newlyAddToCart($pdo): void {
  * @param object $pdo
  * @return void
  */
-function updateQty(object $pdo, int $qty, int $id): void {
+function updateQty(object $pdo, int $id, int $qty): void {
     global $msg;
     try {
         $pdo->beginTransaction();
@@ -584,7 +589,7 @@ function updateQty(object $pdo, int $qty, int $id): void {
             UPDATE
                 EC_cart_detail
             SET
-                product_qty = :qty,
+                qty = :qty,
                 updated_at = :updated_at
             WHERE
                 cart_id = :cart_id
@@ -677,7 +682,7 @@ function insertSales(object $pdo, array $product): void {
             EC_sales (
                 product_id,
                 cart_id,
-                sold_qty,
+                qty,
                 created_at,
                 updated_at
         ) VALUES (
@@ -695,7 +700,7 @@ function insertSales(object $pdo, array $product): void {
         $date = date('Y-m-d');
         $stmt->bindValue(':product_id', $product['product_id']);
         $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
-        $stmt->bindValue(':qty', $product['product_qty']);
+        $stmt->bindValue(':qty', $product['qty']);
         $stmt->bindValue(':created_at', $date);
         $stmt->bindValue(':updated_at', $date);
         $stmt->execute();
@@ -712,14 +717,14 @@ function insertSales(object $pdo, array $product): void {
 
 function changeStock(object $pdo, array $product) {
     $stock = fetchOneFromProduct($pdo, $product['product_id']);
-    $changed_qty = $stock['stock_qty'] - $product['product_qty'];
+    $changed_qty = $stock['qty'] - $product['qty'];
     $date = date('Y-m-d');
 
     $sql = <<<SQL
         UPDATE
             EC_product
         SET
-            stock_qty = :qty,
+            qty = :qty,
             updated_at = :updated_at
         WHERE
             product_id = :id
@@ -786,9 +791,14 @@ function clearCart(object $pdo): void {
  * @param int $cartId カート作成時に付与されたカートID
  * @return object $stmt
  */
-function getSales(object $pdo, int $cartId) {
+function getSales(object $pdo): object {
     $sql = <<<SQL
-        SELECT *
+        SELECT
+            p.product_id,
+            p.product_name,
+            p.price,
+            sp.qty,
+            i.image_name
         FROM EC_sales sp
         LEFT JOIN EC_product p
         ON sp.product_id = p.product_id
@@ -797,7 +807,7 @@ function getSales(object $pdo, int $cartId) {
         WHERE sp.cart_id = :id
     SQL;
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':id', $cartId);
+    $stmt->bindValue(':id', $_SESSION['cart_id']);
     $stmt->execute();
 
     return $stmt;

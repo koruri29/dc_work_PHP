@@ -22,7 +22,7 @@ function showProductData(object $pdo): void {
         print '<tr><th>価格：</th><td>' . $product['price'] . '</td></tr>';
         print '<tr>';
         print '<th>在庫数：</th>';
-        print '<td><input type="text" name="qty" value="' . $product['stock_qty'] . '"></td>';
+        print '<td><input type="text" name="qty" value="' . $product['qty'] . '"></td>';
         print '</tr>';
         print '<tr>';
         print '<th>公開フラグ：</th>';
@@ -223,13 +223,13 @@ function showPublicProduct(object $pdo) {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>在庫数：</th><td>' . $product['stock_qty'] . '点</td></tr>';
+        print '<tr><th>在庫数：</th><td>' . $product['qty'] . '点</td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '">';
         print '<form action="./product.php" method="post">';
-        print '<input type="hidden" name="product_id" value="' . $product['product_id'] . '">';
+        print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
         //print '<button type="submit">カートに入れる</button>';
-        if ($product['stock_qty'] == 0) {
+        if ($product['qty'] == 0) {
             print '<p class="sold-out">売り切れ</p>';
         } else {
             print '<input type="submit" name="submit" value="カートに入れる">';
@@ -253,8 +253,8 @@ function showProductInCart($pdo): void {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>数量：</th><td><input type="number" name="qty' . $i . '" value="' . $product['product_qty'] . '">点</td></tr>';
-        print '<tr><th>小計：</th><td>' . $product['price'] * $product['product_qty'] . '円</td></tr>';
+        print '<tr><th>数量：</th><td><input type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
+        print '<tr><th>小計：</th><td>' . $product['price'] * $product['qty'] . '円</td></tr>';
         print '<tr><th>削除</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
@@ -263,6 +263,18 @@ function showProductInCart($pdo): void {
         print '</div>';
         
         $i++;
+    }
+}
+
+
+function isStockAvailable(object $pdo) {
+    global $error;
+    $stmt = fetchAllInCart($pdo);
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $product = fetchOneFromProduct($pdo, $product['product_id']);
+        if ($product['qty'] == 0 ) {
+            $error = array_merge($error, ['stock' => "カート内の{$product['product_name']}が売り切れています。"]);
+        } 
     }
 }
 
@@ -277,7 +289,7 @@ function calcTotal(object $pdo, callable $funk): int {
     $total = 0;
     $stmt = $funk($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $qty = $product['product_qty'];
+        $qty = $product['qty'];
         $product = fetchOneFromProduct($pdo, $product['product_id']);
         $total += $product['price'] * $qty;
     }
@@ -291,8 +303,8 @@ function calcTotal(object $pdo, callable $funk): int {
  */
 function addToCart(object $pdo): void {
     if (doesExistInCart($pdo)) {
-        $qty = getNewQty($pdo, $_POST['product_id']);
-        updateQty($pdo, $qty);
+        $qty = getNewQty($pdo, $_POST['product-id']);
+        updateQty($pdo, $qty, $_POST['product-id']);
     } else {
         newlyAddToCart($pdo);
     }
@@ -301,10 +313,11 @@ function addToCart(object $pdo): void {
 
 function validateQty() {
     global $error;
+    global $product_num;
 
     $flag = true;
     
-    for ($i = 0; $i < $_POST['product_num']; $i++) {
+    for ($i = 0; $i < $product_num; $i++) {
         if ($_POST['qty' . $i] === '') {
             $error = array_merge($error, ['qty_empty' => '数量が入力されていません。']);
             $flag = false;
@@ -339,9 +352,12 @@ function proceedSales(object $pdo, object $stmt) {
 }
 
 
-function showPurchasedProducts(object $pdo, int $cartId): void {
-    $stmt = getSales($pdo, $cartId);
-
+/**
+ * 
+ * 
+ * @param $stmt getSalesの返り値
+ */
+function showPurchasedProducts(object $pdo, object $stmt): void {
     if ($stmt === false) return;
 
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -351,8 +367,8 @@ function showPurchasedProducts(object $pdo, int $cartId): void {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '</td></tr>';
-        print '<tr><th>数量：</th><td>' . $product['stock_qty'] . '</td></tr>';
-        print '<tr><th>小計：</th><td>' . $product['price'] * $product['changed_qty'] . '</td></tr>';
+        print '<tr><th>数量：</th><td>' . $product['qty'] . '</td></tr>';
+        print '<tr><th>小計：</th><td>' . $product['price'] * $product['qty'] . '</td></tr>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '</table>';
         print '</div>';

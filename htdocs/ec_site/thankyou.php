@@ -23,10 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = fetchAllInCart($db);
     if ($stmt !== false) {
         proceedSales($db, $stmt);
-        $cart_id = $_SESSION['cart_id'];
+        $stmt = getSales($db);
+        $total = calcTotal($db, 'getSales');//合計金額の計算
         restartCart($db);
     }
 }
+
+
 
 
 include_once ('../../include/view/ec_head.html');
