@@ -4,7 +4,7 @@
 if (! empty($msg['thankyou'])) print $msg['thankyou'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    showPurchasedProducts($db, $stmt);
+    showPurchasedProducts($stmt);
 }
 ?>
 <p>合計金額：<?php print $total; ?>円</p>

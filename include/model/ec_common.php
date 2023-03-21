@@ -31,28 +31,66 @@ function sanitize($before) {
  * @return void
  */
 function setSession(array $user): void {
+    $timeout = setSessionTimeout();
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['user_name'] = $user['user_name'];
-    $_SESSION['time'] = time();
+    $_SESSION['timeout'] = $timeout;
+    $_SESSION['expires'] = time() + $timeout;
 }
 
 /**
  * $_SESSIONにログイン情報が保存されているかチェック
  * 
- * @return bool ログインしていればtrue
+ * @return bool
  */
-function isLogin(): bool {
-    if (empty($_SESSION['user_name'])) {
+function isLogin(object $pdo): bool {
+    if ($_SESSION['user_name']) {
+        if ($_SESSION['expires'] <= time()) {
+            return true;
+        }
+    }
+
+    $user_id = checkAuthToken($pdo);
+    if ($user_id !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
+        var_dump($user_id);
+        $user = fetchUser($pdo);
+        setSession($user);
+        $token = setAuthToken($pdo);
+        setcookie('token', $token, $_SESSION['expires']);
+        return true;
+    } else {
         return false;
     }
-    if ($_SESSION['time'] + 3600 <= time()) {
-        $_SESSION = array();
-        session_destroy();
-        return false;
-    }
-    $_SESSION['time'] = time();
-    return true;
 }
+
+
+function setSessionTimeout(): int {
+    $timeout = 30 * 60;
+    if ($_POST['auto-login'] == 'on') {
+        $timeout = 7 * 24 * 60 * 60;
+        session_set_cookie_params($timeout);
+    }
+    return $timeout;
+}
+
+
+/**
+ * 自動ログインが有効ならユーザー名を返す。向こうの場合falseを返す。
+ * 
+ * @param object $pdo
+ * @return bool|false ユーザーIDまたはfalseを返す
+ */
+function checkAuthToken(object $pdo) {
+    $stmt = fetchAutoLogin($pdo, $_COOKIE['token']);
+    if ($rec = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        if ($rec['expires'] < time()) return false;
+        return $rec['user_id'];
+    } else {
+        return false;
+    }
+}
+
+
 
 
 /*-------------------------

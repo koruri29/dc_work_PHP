@@ -34,14 +34,14 @@ require_once ('../../include/model/ec_sql.php');
 require_once ('../../include/model/ec_product.php');
 
 
+$db = getDb();
+
+
 //ログイン認証
-if (! isLogin($_SESSION) || $_SESSION['user_name'] != 'ec_admin') {
+if (! isLogin($db) || $_SESSION['user_name'] != 'ec_admin') {
     header('Location: index.php');
     exit();
 }
-
-//商品登録
-$db = getDb();
 
 
 $error_register = array();

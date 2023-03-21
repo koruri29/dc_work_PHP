@@ -8,7 +8,10 @@ require_once ('../../include/model/ec_sql.php');
 require_once ('../../include/model/ec_user.php');
 
 
-if (isLogin($_SESSION)) {
+$db = getDb();
+
+
+if (isLogin($db)) {
     header('Location: product.php');
     exit();
 }

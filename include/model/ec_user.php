@@ -89,6 +89,8 @@ function authUser(object $pdo): void {
     }
 
     setSession($user);
+    $token = setAuthToken($pdo);
+    setcookie('token', $token, $_SESSION['expires']);
 
     if ($user['user_name'] == 'ec_admin') {
         header('Location: edit.php');

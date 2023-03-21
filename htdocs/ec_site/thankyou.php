@@ -9,13 +9,15 @@ require_once ('../../include/model/ec_product.php');
 require_once ('../../include/model/ec_user.php');
 
 
+$db = getDb();
+
+
 //ログイン認証
-if (! isLogin($_SESSION)) {
+if (! isLogin($db)) {
     header('Location: index.php');
     exit();
 }
 
-$db = getDb();
 
 $msg = array();
 

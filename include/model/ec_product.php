@@ -421,7 +421,6 @@ function proceedSales(object $pdo, object $stmt): void {
  * @return void
  */
 function showPurchasedProducts(object $stmt): void {
-    var_dump($stmt);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
 

@@ -8,6 +8,7 @@
                 <dd><input type="text" name="user-name"></dd>
                 <dt>パスワード</dt>
                 <dd><input type="password" name="password"></dd>
+                <input type="checkbox" name="auto-login">自動ログインをオンにする<br>
                 <input type="submit" value="ログイン">
             </dl>
         </form>

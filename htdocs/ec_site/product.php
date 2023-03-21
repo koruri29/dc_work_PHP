@@ -8,14 +8,15 @@ require_once ('../../include/model/ec_sql.php');
 require_once ('../../include/model/ec_product.php');
 
 
+$db = getDb();
+
+
 //ログイン認証
-if (! isLogin($_SESSION)) {
+if (! isLogin($db)) {
     header('Location: index.php');
     exit();
 }
 
-
-$db = getDb();
 
 $products = fetchPublicProduct($db);
 $error = '';

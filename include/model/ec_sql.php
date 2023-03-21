@@ -17,6 +17,7 @@ function lastInsertId(object $pdo): int {
     return $last_insert_id;
 }
 
+
 /*-------------------------
  * register.php
  *-------------------------*/
@@ -82,7 +83,11 @@ function insertUser(object $pdo): bool {
 function fetchUser(object $pdo) {
     $sql = 'SELECT * FROM EC_user WHERE user_name = :name;';
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':name', $_POST['user-name']);
+    if (isset($_SESSION['user_name'])) {
+        $stmt->bindValue(':name', $_SESSION['user_name']);
+    } else {
+        $stmt->bindValue(':name', $_POST['user-name']);
+    }
     $stmt->execute();
 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -877,7 +882,6 @@ function getSales(object $pdo): object {
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $_SESSION['cart_id']);
     $stmt->execute();
-    var_dump($_SESSION['cart_id']);
     return $stmt;
 }
 
@@ -940,4 +944,82 @@ function orSearch(object $pdo, array $words): object {
     $stmt->execute();
 
     return $stmt;
+}
+
+
+/*-------------------------
+ * AutoLogin（追加要件）
+ *-------------------------*/
+/**
+ * トークンを生成し、自動ログインテーブルにセット
+ * 
+ * 自動ログインを判断するためのトークンを生成し、
+ * ユーザーID・有効期限とともに自動ログインテーブルにセットする。
+ * 
+ * @param object $pdo
+ * @return string $token トークン（乱数）
+ */
+function setAuthToken(object $pdo): string {
+    $token = bin2hex(random_bytes(100));
+    try {
+    $pdo->beginTransaction();
+
+    $sql = <<<SQL
+        INSERT INTO
+            EC_autologin (
+                token,
+                user_id,
+                expires
+            ) VALUES (
+                :token,
+                :id,
+                :expires
+            )
+    SQL;
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':token', $token);
+    $stmt->bindValue(':id', $_SESSION['user_id']);
+    $stmt->bindValue(':expires', $_SESSION['expires']);
+    $stmt->execute();
+
+    $pdo->commit();
+    return $token;
+} catch (PDOException $e) {
+    $pdo->rollback();
+    echo $e->getMessage();
+    exit();
+}
+}
+
+/**
+* 自動ログインテーブルから、該当するトークンのレコードを取得
+* 
+* @param object $pdo
+* @return object $stmt
+*/
+function fetchAutoLogin(object $pdo): object {
+    $sql = 'SELECT * FROM EC_autologin WHERE token = :token';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':token', $_COOKIE['token']);
+    $stmt->execute();
+    
+    return $stmt;
+}
+
+
+function deleteToken (object $pdo): void {
+    try {
+        $pdo->beginTransaction();
+
+        $sql = 'DELETE FROM EC_autologin WHERE token = :token;';
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':token', $_COOKIE['token']);
+        $stmt->execute();
+
+        $pdo->commit();
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }
 }
