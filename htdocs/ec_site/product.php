@@ -17,11 +17,16 @@ if (! isLogin($_SESSION)) {
 
 $db = getDb();
 
-
+$products = fetchPublicProduct($db);
+$error = '';
 $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    addToCart($db);
+    if ($_POST['submit'] == 'カートに入れる'){
+        addToCart($db);
+    } else if ($_POST['submit'] == '検索') {
+        $products = searchProduct($db);
+    }
 } 
 
 

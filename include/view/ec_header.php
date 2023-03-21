@@ -6,8 +6,11 @@
 
         <?php if (isset($_SESSION['user_name'])): ?>
             <li class="nav-item">
-                <form action="#" method="post">
-                    <input type="search" name="search"><input type="submit" value="検索">
+                <form action="./product.php" method="post">
+                    <input type="search" name="search">
+                    <input type="radio" name="and-or" value="and" checked>and検索
+                    <input type="radio" name="and-or" value="or">or検索
+                    <input type="submit" name="submit" value="検索">
                 </form>
             </li>
             <li class="nav-item">

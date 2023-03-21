@@ -138,11 +138,42 @@ function createCart(object $pdo): void {
  * @return object $products 商品データ
  */
 function fetchAllProduct(object $pdo): object {
-    $sql = 'SELECT * FROM EC_product p LEFT JOIN EC_image i ON p.image_id = i.image_id WHERE 1 = 1;';
+    $sql = <<<SQL
+        SELECT
+            product_id,
+            product_name,
+            price,
+            qty,
+            public_flag,
+            p.updated_at,
+            image_name
+        FROM EC_product p 
+        LEFT JOIN EC_image i
+        ON p.image_id = i.image_id
+        WHERE 1 = 1
+    SQL;
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     
     return $stmt;
+}
+
+
+/**
+ * 商品テーブルに登録の商品の種類数をカウント
+ * 
+ * 商品編集画面で、フォームで飛ばすために商品の総種類数を数える
+ * 
+ * @param object $pdo
+ * @return int $product_num 商品テーブルに登録されている商品の種類数
+ */
+function countAllProduct(object $pdo): int {
+    $sql = 'SELECT COUNT(*) AS cnt FROM EC_product WHERE 1 = 1;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $count = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $count['cnt'];
 }
 
 /**
@@ -240,9 +271,11 @@ function insertProduct(object $pdo, int $last_insert_id):bool {
  * 商品管理画面で、在庫数を変更する
  * 
  * @param object $pdo
+ * @param int $id 商品ID
+ * @param int $qty 変更したい商品の数量
  * @return void
  */
-function updateStock(object $pdo): void {
+function updateStock(object $pdo, int $id, int $qty): void {
     global $msg_update;
     $date = date('Y-m-d');
 
@@ -259,15 +292,15 @@ function updateStock(object $pdo): void {
         $pdo->beginTransaction();
 
         $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':qty', $_POST['qty']);
+        $stmt->bindValue(':qty', $qty);
         $stmt->bindValue(':updated_at', $date);
-        $stmt->bindValue(':id', $_POST['product-id']);
+        $stmt->bindValue(':id', $id);
         $stmt->execute();
         
         $pdo->commit();
         
         if ($stmt->rowCount() > 0) {            
-            $msg_update = '在庫数を更新しました。';
+            $msg_update = array_merge($msg_update, ['stock' => '在庫数を更新しました。']);
         }
     } catch (PDOException $e) {
         $pdo->rollback();
@@ -280,11 +313,12 @@ function updateStock(object $pdo): void {
  * 商品管理画面で、公開フラグを変更する
  * 
  * @param object $pdo
+ * @param int $id 商品ID
  * @return void
  */
-function updateFlag(object $pdo): void {
+function updateFlag(object $pdo, int $id): void {
     global $msg_update;
-    $product = fetchOneFromProduct($pdo, $_POST['product-id']);
+    $product = fetchOneFromProduct($pdo, $id);
     $flag = $product['public_flag'] === 1 ? 0 : 1;
     $date = date('Y-m-d');
 
@@ -303,16 +337,16 @@ function updateFlag(object $pdo): void {
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':flag', $flag);
         $stmt->bindValue(':updated_at', $date);
-        $stmt->bindValue(':id', $_POST['product-id']);
+        $stmt->bindValue(':id', $id);
         $stmt->execute();
         
         $pdo->commit();
 
         if ($stmt->rowCount() > 0) {            
             if ($flag === 0) {
-                $msg_update = '非公開に変更しました。';
+            $msg_update = array_merge($msg_update, ['display' => '公開に変更しました。']);
                 } else {
-                $msg_update = '公開に変更しました。';
+            $msg_update = array_merge($msg_update, ['non-display' => '非公開に変更しました。']);
                 }
         }
     } catch (PDOException $e) {
@@ -326,22 +360,23 @@ function updateFlag(object $pdo): void {
  * 商品管理画面で、指定の商品を削除する
  * 
  * @param object $pdo
+ * @param int $id 商品ID
  * @return void
  */
-function deleteProduct(object $pdo): void {
+function deleteProduct(object $pdo, int $id): void {
     global $msg_update;
     $sql = 'DELETE FROM EC_product WHERE product_id = :id;';
     try {
         $pdo->beginTransaction();
 
         $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':id', $_POST['product-id']);
+        $stmt->bindValue(':id', $id);
         $stmt->execute();
         
         $pdo->commit();
 
         if ($stmt->rowCount() > 0) {            
-            $msg_update = '商品を削除しました。';
+            $msg_update = array_merge($msg_update, ['delete' => '商品を削除しました。']);
         }
     } catch (PDOException $e) {
         $pdo->rollback();
@@ -830,17 +865,78 @@ function getSales(object $pdo): object {
             p.product_id,
             p.product_name,
             p.price,
-            sp.qty,
+            s.qty,
             i.image_name
-        FROM EC_sales sp
+        FROM EC_sales s
         LEFT JOIN EC_product p
-        ON sp.product_id = p.product_id
+        ON s.product_id = p.product_id
         JOIN EC_image i
         ON p.image_id = i.image_id
-        WHERE sp.cart_id = :id
+        WHERE s.cart_id = :id
     SQL;
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':id', $_SESSION['cart_id']);
+    $stmt->execute();
+    var_dump($_SESSION['cart_id']);
+    return $stmt;
+}
+
+
+/*-------------------------
+ * SEARCH
+ *-------------------------*/
+/**
+ * 公開中商品のAND検索機能
+ * 
+ * @param object $pdo
+ * @param array $words 検索ワードを配列化したもの
+ * @return object $stmt 検索結果のデータ
+ */
+function andSearch(object $pdo, array $words): object {
+    $arr = array();
+    $arr[] = <<<SQL
+        SELECT *
+        FROM EC_product p
+        LEFT JOIN EC_image i
+        ON p.image_id = i.image_id
+        WHERE public_flag = 1 AND product_name LIKE 
+    SQL;
+    for ($i = 0; $i < count($words); $i++) {
+        $arr[] = '\'%' . $words[$i] . '%\'';
+        $arr[] = ' AND product_name LIKE ';
+    }
+    $arr[count($words) * 2] = '';//最後のANDを削除
+
+    $sql = implode('', $arr);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+
+    return $stmt;
+}
+/**
+ * 公開中商品のOR検索機能
+ * 
+ * @param object $pdo
+ * @param array $words 検索ワードを配列化したもの
+ * @return object $stmt 検索結果のデータ
+ */
+function orSearch(object $pdo, array $words): object {
+    $arr = array();
+    $arr[] = <<<SQL
+        SELECT *
+        FROM EC_product p
+        LEFT JOIN EC_image i
+        ON p.image_id = i.image_id
+        WHERE public_flag = 1 AND product_name LIKE 
+    SQL;
+    for ($i = 0; $i < count($words); $i++) {
+        $arr[] = '\'%' . $words[$i] . '%\'';
+        $arr[] = ' OR product_name LIKE ';
+    }
+    $arr[count($words) * 2] = '';//最後のORを削除
+
+    $sql = implode('', $arr);
+    $stmt = $pdo->prepare($sql);
     $stmt->execute();
 
     return $stmt;

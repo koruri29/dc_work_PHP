@@ -18,15 +18,14 @@ if (! isLogin($_SESSION)) {
 $db = getDb();
 
 $msg = array();
+
 //LOCK TABLES
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = fetchAllInCart($db);
-    if ($stmt !== false) {
-        proceedSales($db, $stmt);
-        $stmt = getSales($db);
-        $total = calcTotal($db, 'getSales');//合計金額の計算
-        restartCart($db);
-    }
+    proceedSales($db, $stmt);
+    $stmt = getSales($db);
+    $total = calcTotal($db, 'getSales');//合計金額の計算
+    restartCart($db);
 }
 
 

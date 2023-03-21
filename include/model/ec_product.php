@@ -11,19 +11,19 @@
  */
 function showProductData(object $pdo): void {
     $stmt = fetchAllProduct($pdo);
+    $i = 0;
 
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
 
         print '<div class="item">';
-        print '<form action="./edit.php" method="post">';
         print '<table>';
         print '<tr><th>商品ID：</th><td>' . $product['product_id'] . '</td></tr>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '</td></tr>';
         print '<tr>';
         print '<th>在庫数：</th>';
-        print '<td><input type="text" name="qty" value="' . $product['qty'] . '"></td>';
+        print '<td><input type="text" name="qty' . $i . '" value="' . $product['qty'] . '"></td>';
         print '</tr>';
         print '<tr>';
         print '<th>公開フラグ：</th>';
@@ -35,17 +35,17 @@ function showProductData(object $pdo): void {
         } else {
             print '<span class="non-displayed">非公開です</span><br>';
         }
-        print '<input class="display-flag" type="checkbox" name="display-flag">設定を変更';
+        print '<input class="display-flag" type="checkbox" name="display-flag' . $i . '">設定を変更';
         print '</td>';
         print '</tr>';
-        print '<tr><th>削除：</th><td><input type="checkbox" name="delete"></td></tr>';
-        // print '<tr><th>更新日：</th><td>' . $product['updated_at'] . '</td></tr>';
-        print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
-        print '<tr><th><input class="submit" name="submit" type="submit" value="設定を変更する"></th><td></td></tr>';
+        print '<tr><th>削除：</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
+        print '<tr><th>更新日：</th><td>' . $product['updated_at'] . '</td></tr>';
+        print '<input type="hidden" name="product-id' . $i . '" value="' . $product['product_id'] . '">';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
-        print '</form>';
         print '</div>';
+
+        $i++;
     } 
 }
 
@@ -57,16 +57,19 @@ function showProductData(object $pdo): void {
  * @return void
  */
 function proceedUpdateProduct(object $pdo): void {
-    if (! validateUpdatedProduct()) return;
-
-    updateStock($pdo);
-    if ($_POST['display-flag']) {
-        updateFlag($pdo);
-        return;
-    }
-    if ($_POST['delete']) {
-        deleteProduct($pdo);
-        return;
+    for ($i = 0; $i <$_POST['product-num']; $i++) {
+        if (! validateUpdatedProduct($_POST['qty' . $i], $_POST['public_flag' . $i])) return;
+        $rec = fetchOneFromProduct($pdo, $_POST['product-id' . $i]);
+        $current_qty = $rec['qty'];
+        if ($_POST['qty' . $i] != $current_qty){
+            updateStock($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);
+        }
+        if ($_POST['display-flag'. $i]) {
+            updateFlag($pdo, $_POST['product-id' . $i]);
+        }
+        if ($_POST['delete' . $i]) {
+            deleteProduct($pdo, $_POST['product-id' . $i]);
+        }
     }
 }
 
@@ -190,24 +193,24 @@ function validateProduct(): bool {
  * 
  * @return bool 未入力や不正な値がなければtrue
  */
-function validateUpdatedProduct(): bool {
+function validateUpdatedProduct($qty, $public_flag): bool {
     global $error_update;
 
     $flag = true;
     
-    if ($_POST['qty'] === '') {
+    if ($qty === '') {
         $error_update = array_merge($error_update, ['qty_empty' => '在庫数が入力されていません。']);
         $flag = false;
     }
-    if (! is_numeric($_POST['qty'])) {
+    if (! is_numeric($qty)) {
         $error_update = array_merge($error_update, ['qty_not_num' => '在庫数は半角数字で入力してください。']);
         $flag = false;
     }
-    if ($_POST['qty'] < 0) {
+    if ($qty < 0) {
         $error_update = array_merge($error_update, ['qty_minus' => '在庫数は正の整数を入力してください。']);
         $flag = false;
     }
-    if ($_POST['public_flag'] === 0 | $_POST['public_flag'] === 1) {
+    if ($public_flag === 0 | $public_flag === 1) {
         $error_update = array_merge($error_update, ['flag_empty' => '公開ステータスを選択してください']);
         $flag = false;
     }
@@ -226,12 +229,14 @@ function validateUpdatedProduct(): bool {
 /**
  * 商品一覧画面で、公開中の商品すべてを表示する関数
  * 
- * @param object $pdo
+ * @param object $stmt 商品一覧データまたは検索結果
  * @return void
  */
-function showPublicProduct(object $pdo): void {
-    $stmt = fetchPublicProduct($pdo);
+function showPublicProduct(object $stmt): void {
+    global $error;
+    $flag = false;
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $flag = true;
         $product = sanitize($product);
 
         print '<div class="item">';
@@ -241,28 +246,36 @@ function showPublicProduct(object $pdo): void {
         print '<tr><th>在庫数：</th><td>' . $product['qty'] . '点</td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '">';
-        print '<form action="./product.php" method="post">';
-        print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
         //print '<button type="submit">カートに入れる</button>';
         if ($product['qty'] == 0) {
             print '<p class="sold-out">売り切れ</p>';
         } else {
-            print '<input type="submit" name="submit" value="カートに入れる">';
-        }
+        print '<form action="./product.php" method="post">';
+        print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
+        print '<input type="submit" name="submit" value="カートに入れる">';
         print '</form>';
+    }
         print '</div>';
     }
+    if (! $flag) $error = '検索結果は0件です。';
 }
 
-
-// function countTotalProduct(object $pdo) : int {
-//     $stmt = fetchAllInCart($pdo);
-//     $total = 0;
-//     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
-//         $total += $product['qty'];
-//     }
-//     return $total;
-// }
+/**
+ * カート内の商品点数の合計を表示する
+ * 
+ * ヘッダーのナビゲーションの「カートを見る」の部分に表示する
+ * 
+ * @param object $pdo
+ * @return int $total カート内の商品点数の合計
+ */
+function countTotalProduct(object $pdo) : int {
+    $stmt = fetchAllInCart($pdo);
+    $total = 0;
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $total += $product['qty'];
+    }
+    return $total;
+}
 
 /*-------------------------
  * cart.php
@@ -408,8 +421,7 @@ function proceedSales(object $pdo, object $stmt): void {
  * @return void
  */
 function showPurchasedProducts(object $stmt): void {
-    if ($stmt === false) return;
-
+    var_dump($stmt);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
 

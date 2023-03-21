@@ -20,7 +20,13 @@
         ?>
         <input type="submit" value="登録">
     </form>
-    <?php if (! empty($msg_update)) print '<p class="msg">' . $msg_update . '</p>'; ?>
+    <?php
+        if (! empty($msg_update)) {
+            foreach ($msg_update as $msg) {
+                print '<p class="msg">' . $msg . '</p>';
+            }
+        }
+    ?>
     <?php
         if (! empty($error_update)) {
             foreach ($error_update as $error) {
@@ -28,7 +34,11 @@
             }
         }
     ?>
-    <?php showProductData($db); ?>
+    <form action="./edit.php" method="post">
+        <?php showProductData($db); ?>
+        <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
+        <input class="submit" name="submit" type="submit" value="設定を変更する">
+    </form>
     <script>
         const item = document.getElementsByClassName('item');
         const displayFlag = document.getElementsByClassName('display-flag')

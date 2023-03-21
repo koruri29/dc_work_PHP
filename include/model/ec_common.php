@@ -53,3 +53,19 @@ function isLogin(): bool {
     $_SESSION['time'] = time();
     return true;
 }
+
+
+/*-------------------------
+ * SEARCH
+ *-------------------------*/
+function searchProduct(object $pdo): object {
+    //文字列を整える
+    $hankaku = mb_convert_kana($_POST['search'], 's', 'utf-8');
+    $words = preg_split('/[\s]/', $hankaku);
+
+    if ($_POST['and-or'] == 'and') {
+        return andSearch($pdo, $words);
+    } else {
+        return orSearch($pdo, $words);
+    }
+}

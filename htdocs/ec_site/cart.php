@@ -20,7 +20,7 @@ $db = getDb();
 
 $error = array();
 $msg = '';
-//カート内商品の個数
+//カート内商品の種類数
 $product_num = countProductInCart($db);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
