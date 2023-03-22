@@ -77,7 +77,7 @@ function validatePassword(string $password): void {
 function authUser(object $pdo): void {
     global $error;
 
-    $user = fetchUser($pdo);
+    $user = fetchUser($pdo, $_POST['user-name']);
 
     if ($user == false) {
         $error  = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
@@ -89,8 +89,6 @@ function authUser(object $pdo): void {
     }
 
     setSession($user);
-    $token = setAuthToken($pdo);
-    setcookie('token', $token, $_SESSION['expires']);
 
     if ($user['user_name'] == 'ec_admin') {
         header('Location: edit.php');

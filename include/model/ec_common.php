@@ -31,10 +31,10 @@ function sanitize($before) {
  * @return void
  */
 function setSession(array $user): void {
-    $timeout = setSessionTimeout();
+    global $timeout;
     $_SESSION['user_name'] = $user['user_name'];
     $_SESSION['timeout'] = $timeout;
-    $_SESSION['expires'] = date('Y-m-d H:i:s', time() + $timeout);
+    $_SESSION['expires'] = time() + $timeout;
 }
 
 /**
@@ -44,17 +44,17 @@ function setSession(array $user): void {
  */
 function isLogin(object $pdo): bool {
     if ($_SESSION['user_name']) {
-        if ($_SESSION['expires'] <= time()) {
+        if ($_SESSION['expires'] > time()) {
             return true;
         }
     }
-
     $user_name = checkAuthToken($pdo);
     if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
-        $user = fetchUser($pdo);
+        $user = fetchUser($pdo, $user_name);
         setSession($user);
         $token = setAuthToken($pdo);
         setcookie('token', $token, $_SESSION['expires']);
+        createCart($pdo);
         return true;
     } else {
         return false;
@@ -81,7 +81,7 @@ function setSessionTimeout(): int {
 function checkAuthToken(object $pdo) {
     $stmt = fetchAutoLogin($pdo, $_COOKIE['token']);
     if ($rec = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        if ($rec['expires'] < time()) return false;
+        if ($rec['expires'] < time())  return false;
         return $rec['user_name'];
     } else {
         return false;

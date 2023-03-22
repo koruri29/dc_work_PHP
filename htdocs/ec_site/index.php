@@ -1,7 +1,4 @@
 <?php
-session_start();
-session_regenerate_id(true);
-
 require_once ('../../include/model/ec_getDb.php');
 require_once ('../../include/model/ec_common.php');
 require_once ('../../include/model/ec_sql.php');
@@ -9,6 +6,17 @@ require_once ('../../include/model/ec_user.php');
 
 
 $db = getDb();
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $timeout = setSessionTimeout();
+    $token = setAuthToken($db);
+    setcookie('token', $token, time() + $timeout);
+}
+
+
+session_start();
+session_regenerate_id(true);
 
 
 if (isLogin($db)) {

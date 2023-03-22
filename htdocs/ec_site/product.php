@@ -13,8 +13,8 @@ $db = getDb();
 
 //ログイン認証
 if (! isLogin($db)) {
-    header('Location: index.php');
-    exit();
+    // header('Location: index.php');
+    // exit();
 }
 
 
@@ -25,7 +25,7 @@ $msg = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($_POST['submit'] == 'カートに入れる'){
         addToCart($db);
-    } else if ($_POST['submit'] == '検索') {
+    } else {//検索
         $products = searchProduct($db);
     }
 } 

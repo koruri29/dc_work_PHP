@@ -96,16 +96,13 @@ function insertUser(object $pdo): bool {
  * データベースからユーザー情報を取得する関数
  * 
  * @param object $pdo
+ * @param string $userName
  * @return array|bool データがあれば配列。なければfalse
  */
-function fetchUser(object $pdo) {
+function fetchUser(object $pdo, string $userName) {
     $sql = 'SELECT * FROM EC_user WHERE user_name = :name;';
     $stmt = $pdo->prepare($sql);
-    if (isset($_SESSION['user_name'])) {
-        $stmt->bindValue(':name', $_SESSION['user_name']);
-    } else {
-        $stmt->bindValue(':name', $_POST['user-name']);
-    }
+    $stmt->bindValue(':name', $userName);
     $stmt->execute();
 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -978,35 +975,40 @@ function orSearch(object $pdo, array $words): object {
  * @return string $token トークン（乱数）
  */
 function setAuthToken(object $pdo): string {
+    global $timeout;
     $token = bin2hex(random_bytes(100));
     try {
-    $pdo->beginTransaction();
-
-    $sql = <<<SQL
-        INSERT INTO
-            EC_autologin (
-                token,
-                user_name,
-                expires
-            ) VALUES (
-                :token,
-                :id,
-                :expires
-            )
-    SQL;
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':token', $token);
-    $stmt->bindValue(':id', $_SESSION['user_name']);
-    $stmt->bindValue(':expires', $_SESSION['expires']);
-    $stmt->execute();
-
-    $pdo->commit();
-    return $token;
-} catch (PDOException $e) {
-    $pdo->rollback();
-    echo $e->getMessage();
-    exit();
-}
+        $pdo->beginTransaction();
+    
+        $sql = <<<SQL
+            INSERT INTO
+                EC_autologin (
+                    token,
+                    user_name,
+                    expires
+                ) VALUES (
+                    :token,
+                    :user_name,
+                    :expires
+                )
+        SQL;
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':token', $token);
+        if (empty($_SESSION['user_name'])) {
+            $stmt->bindValue(':user_name', $_POST['user-name']);
+        } else {
+            $stmt->bindValue(':user_name', $_SESSION['user_name']);
+        }
+        $stmt->bindValue(':expires', time() + $timeout);
+        $stmt->execute();
+    
+        $pdo->commit();
+        return $token;
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }
 }
 
 /**
