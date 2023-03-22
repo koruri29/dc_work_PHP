@@ -34,7 +34,7 @@ function setSession(array $user): void {
     $timeout = setSessionTimeout();
     $_SESSION['user_name'] = $user['user_name'];
     $_SESSION['timeout'] = $timeout;
-    $_SESSION['expires'] = time() + $timeout;
+    $_SESSION['expires'] = date('Y-m-d H:i:s', time() + $timeout);
 }
 
 /**
