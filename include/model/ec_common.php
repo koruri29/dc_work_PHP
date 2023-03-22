@@ -32,7 +32,6 @@ function sanitize($before) {
  */
 function setSession(array $user): void {
     $timeout = setSessionTimeout();
-    $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['user_name'] = $user['user_name'];
     $_SESSION['timeout'] = $timeout;
     $_SESSION['expires'] = time() + $timeout;
@@ -50,9 +49,8 @@ function isLogin(object $pdo): bool {
         }
     }
 
-    $user_id = checkAuthToken($pdo);
-    if ($user_id !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
-        var_dump($user_id);
+    $user_name = checkAuthToken($pdo);
+    if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
         $user = fetchUser($pdo);
         setSession($user);
         $token = setAuthToken($pdo);
@@ -84,7 +82,7 @@ function checkAuthToken(object $pdo) {
     $stmt = fetchAutoLogin($pdo, $_COOKIE['token']);
     if ($rec = $stmt->fetch(PDO::FETCH_ASSOC)) {
         if ($rec['expires'] < time()) return false;
-        return $rec['user_id'];
+        return $rec['user_name'];
     } else {
         return false;
     }

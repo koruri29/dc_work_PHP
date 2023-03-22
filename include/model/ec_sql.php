@@ -18,6 +18,24 @@ function lastInsertId(object $pdo): int {
 }
 
 
+// /**
+//  * データベースからユーザー情報を取得する関数
+//  * 
+//  * @param object $pdo
+//  * @param int $id ユーザーID
+//  * @return array|bool データがあれば配列。なければfalse
+//  */
+// function fetchUserByName(object $pdo) {
+//     $sql = 'SELECT * FROM EC_user WHERE user_name = :name;';
+//     $stmt = $pdo->prepare($sql);
+//     $stmt->bindValue(':name', $_SESSION['user_name']);
+//     $stmt->execute();
+
+//     $user = $stmt->fetch(PDO::FETCH_ASSOC);
+//     return $user;
+// }
+
+
 /*-------------------------
  * register.php
  *-------------------------*/
@@ -108,18 +126,18 @@ function createCart(object $pdo): void {
         $sql = <<<SQL
             INSERT INTO
                 EC_cart (
-                    user_id,
+                    user_name,
                     created_at,
                     updated_at
             ) VALUES (
-                :user_id,
+                :user_name,
                 :created_at,
                 :updated_at
             );
         SQL;
         $stmt = $pdo->prepare($sql);
         $date = date('Y-m-d');
-        $stmt->bindValue(':user_id', $_SESSION['user_id']);
+        $stmt->bindValue(':user_name', $_SESSION['user_name']);
         $stmt->bindValue(':created_at', $date);
         $stmt->bindValue(':updated_at', $date);
         $stmt->execute();
@@ -968,7 +986,7 @@ function setAuthToken(object $pdo): string {
         INSERT INTO
             EC_autologin (
                 token,
-                user_id,
+                user_name,
                 expires
             ) VALUES (
                 :token,
@@ -978,7 +996,7 @@ function setAuthToken(object $pdo): string {
     SQL;
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':token', $token);
-    $stmt->bindValue(':id', $_SESSION['user_id']);
+    $stmt->bindValue(':id', $_SESSION['user_name']);
     $stmt->bindValue(':expires', $_SESSION['expires']);
     $stmt->execute();
 
