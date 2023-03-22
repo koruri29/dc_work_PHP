@@ -16,7 +16,7 @@ if (! isLogin($db)) {
     // header('Location: index.php');
     // exit();
 }
-
+var_dump($_SESSION);
 
 $products = fetchPublicProduct($db);
 $error = '';

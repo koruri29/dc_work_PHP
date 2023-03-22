@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 配列・文字列にhtmlspecialcharsをかける関数
  * 
@@ -44,17 +43,22 @@ function setSession(array $user): void {
  */
 function isLogin(object $pdo): bool {
     if ($_SESSION['user_name']) {
+        print 'user_name効いてるよん';
         if ($_SESSION['expires'] > time()) {
+            print 'expires問題ないよん';
             return true;
         }
     }
+
     $user_name = checkAuthToken($pdo);
     if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
+        print 'いい分岐に入ったよ';
         $user = fetchUser($pdo, $user_name);
         setSession($user);
         $token = setAuthToken($pdo);
         setcookie('token', $token, $_SESSION['expires']);
         createCart($pdo);
+        $_SESSION['cart_id'] = lastInsertId($pdo);
         return true;
     } else {
         return false;
@@ -62,9 +66,9 @@ function isLogin(object $pdo): bool {
 }
 
 
-function setSessionTimeout(): int {
+function setSessionTimeout($pdo): int {
     $timeout = 30 * 60;
-    if ($_POST['auto-login'] == 'on') {
+    if ($_POST['auto-login'] == 'on' || checkAuthToken($pdo) !== false) {
         $timeout = 7 * 24 * 60 * 60;
         session_set_cookie_params($timeout);
     }
@@ -87,8 +91,6 @@ function checkAuthToken(object $pdo) {
         return false;
     }
 }
-
-
 
 
 /*-------------------------

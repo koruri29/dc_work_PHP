@@ -9,7 +9,7 @@ $db = getDb();
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $timeout = setSessionTimeout();
+    $timeout = setSessionTimeout($db);
     $token = setAuthToken($db);
     setcookie('token', $token, time() + $timeout);
 }

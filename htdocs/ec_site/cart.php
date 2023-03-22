@@ -20,8 +20,7 @@ if (! isLogin($db)) {
 
 $error = array();
 $msg = '';
-//カート内商品の種類数
-$product_num = countProductInCart($db);
+$product_num = countProductInCart($db);//カート内商品の種類数。formで渡す用
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (validateQty()) {
