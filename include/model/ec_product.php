@@ -23,7 +23,7 @@ function showProductData(object $pdo): void {
         print '<tr><th>価格：</th><td>' . $product['price'] . '</td></tr>';
         print '<tr>';
         print '<th>在庫数：</th>';
-        print '<td><input type="text" name="qty' . $i . '" value="' . $product['qty'] . '"></td>';
+        print '<td><input class="qty" type="text" name="qty' . $i . '" value="' . $product['qty'] . '"></td>';
         print '</tr>';
         print '<tr>';
         print '<th>公開フラグ：</th>';
@@ -35,7 +35,7 @@ function showProductData(object $pdo): void {
         } else {
             print '<span class="non-displayed">非公開です</span><br>';
         }
-        print '<input class="display-flag" type="checkbox" name="display-flag' . $i . '">設定を変更';
+        print '<input class="public-flag" type="checkbox" name="display-flag' . $i . '">設定を変更';
         print '</td>';
         print '</tr>';
         print '<tr><th>削除：</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
@@ -175,10 +175,10 @@ function validateProduct(): bool {
         $error_register = array_merge($error_register, ['qty_minus' => '在庫数は正の整数を入力してください。']);
         $flag = false;
     }
-    if ($_POST['public_flag'] === 0 | $_POST['public_flag'] === 1) {
-        $error_register = array_merge($error_register, ['flag_empty' => '公開ステータスを選択してください']);
-        $flag = false;
-    }
+    // if ($_POST['public_flag'] === 0 | $_POST['public_flag'] === 1) {
+    //     $error_register = array_merge($error_register, ['flag_empty' => '公開ステータスを選択してください']);
+    //     $flag = false;
+    // }
 
     if ($flag === true) {
         return true;
@@ -210,10 +210,10 @@ function validateUpdatedProduct($qty, $public_flag): bool {
         $error_update = array_merge($error_update, ['qty_minus' => '在庫数は正の整数を入力してください。']);
         $flag = false;
     }
-    if ($public_flag === 0 | $public_flag === 1) {
-        $error_update = array_merge($error_update, ['flag_empty' => '公開ステータスを選択してください']);
-        $flag = false;
-    }
+    // if ($public_flag === 0 | $public_flag === 1) {
+    //     $error_update = array_merge($error_update, ['flag_empty' => '公開ステータスを選択してください']);
+    //     $flag = false;
+    // }
 
     if ($flag === true) {
         return true;
@@ -252,7 +252,7 @@ function showPublicProduct(object $stmt): void {
         } else {
         print '<form action="./product.php" method="post">';
         print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
-        print '<input type="submit" name="submit" value="カートに入れる">';
+        print '<input class="submit" type="submit" name="submit" value="カートに入れる">';
         print '</form>';
     }
         print '</div>';
@@ -296,7 +296,7 @@ function showProductInCart(object $pdo): void {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>数量：</th><td><input type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
+        print '<tr><th>数量：</th><td><input class="qty" type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['qty'] . '円</td></tr>';
         print '<tr><th>削除</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
         print '</table>';

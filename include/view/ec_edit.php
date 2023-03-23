@@ -1,50 +1,47 @@
 <body>
-    <h3>商品登録</h3>
+    <h2 class="h2">商品登録</h2>
     <?php if (! empty($msg_register)) print '<p class="msg">' . $msg_register . '</p>'; ?>
 
-    <form action="./edit.php" method="post" enctype="multipart/form-data">
-        商品名<input type="text" name="name"><br>
-        価格<input type="number" name="price"><br>
-        在庫数<input type="number" name="qty"><br>
+    <form id="register" action="./edit.php" method="post" enctype="multipart/form-data">
+        商品名<input id="product-name" type="text" name="name"><br>
+        価格<input id="price" type="number" name="price"><br>
+        在庫数<input id="qty" type="number" name="qty"><br>
         公開ステータス：
-        公開<input type="radio" name="public_flag" value="1" checked>
-        非公開<input type="radio" name="public_flag" value="0"><br>
-        画像ファイル<input type="file" name="image"><br>
+        公開<input class="public-flag" type="radio" name="public_flag" value="1" checked>
+        非公開<input class="public-flag" type="radio" name="public_flag" value="0"><br>
+        画像ファイル<input class="image" type="file" name="image"><br>
         <input type="hidden" name="register">
+        <div id="register-error">
+            <?php
+                if (! empty($error_register)) {
+                    foreach ($error_register as $error) {
+                        print '<p class="error">' . $error . '</p>';
+                    }
+                }
+            ?>
+        </div>
+        <input id="register-product" type="submit" value="登録">
+    </form>
+    <div id="update-error">
         <?php
-            if (! empty($error_register)) {
-                foreach ($error_register as $error) {
+            if (! empty($msg_update)) {
+                foreach ($msg_update as $msg) {
+                    print '<p class="msg">' . $msg . '</p>';
+                }
+            }
+        ?>
+        <?php
+            if (! empty($error_update)) {
+                foreach ($error_update as $error) {
                     print '<p class="error">' . $error . '</p>';
                 }
             }
         ?>
-        <input type="submit" value="登録">
-    </form>
-    <?php
-        if (! empty($msg_update)) {
-            foreach ($msg_update as $msg) {
-                print '<p class="msg">' . $msg . '</p>';
-            }
-        }
-    ?>
-    <?php
-        if (! empty($error_update)) {
-            foreach ($error_update as $error) {
-                print '<p class="error">' . $error . '</p>';
-            }
-        }
-    ?>
-    <form action="./edit.php" method="post">
+    </div>
+    <form id="update" action="./edit.php" method="post">
         <?php showProductData($db); ?>
         <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
-        <input class="submit" name="submit" type="submit" value="設定を変更する">
+        <input id="update-product" name="submit" type="submit" value="設定を変更する">
     </form>
-    <script>
-        const item = document.getElementsByClassName('item');
-        const displayFlag = document.getElementsByClassName('display-flag')
-        const productId = document.getElementsByClassName('product-id');
-        const submit = document.getElementsByClassName('submit');
-        for (let i = 0; i < item.length; i++) {
-
-        }
-    </script>
+    <script src="../../0006/js/main.js"></script>
+	<script src="../../0006/js/edit.js"></script>
