@@ -974,7 +974,7 @@ function orSearch(object $pdo, array $words): object {
  * @param object $pdo
  * @return string $token トークン（乱数）
  */
-function setAuthToken(object $pdo): string {
+function setAuthToken(object $pdo, string $user_name): string {
     global $timeout;
     $token = bin2hex(random_bytes(100));
     try {
@@ -994,11 +994,7 @@ function setAuthToken(object $pdo): string {
         SQL;
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':token', $token);
-        if (empty($_SESSION['user_name'])) {
-            $stmt->bindValue(':user_name', $_POST['user-name']);
-        } else {
-            $stmt->bindValue(':user_name', $_SESSION['user_name']);
-        }
+        $stmt->bindValue(':user_name', $user_name);
         $stmt->bindValue(':expires', time() + $timeout);
         $stmt->execute();
     

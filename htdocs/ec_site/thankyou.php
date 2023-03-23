@@ -1,7 +1,4 @@
 <?php
-session_start();
-session_regenerate_id(true);
-
 require_once ('../../include/model/ec_getDb.php');
 require_once ('../../include/model/ec_common.php');
 require_once ('../../include/model/ec_sql.php');
@@ -10,6 +7,17 @@ require_once ('../../include/model/ec_user.php');
 
 
 $db = getDb();
+
+
+if ($user_name = checkAuthToken($db)) {
+    $timeout = setTimeout($db);
+    $token = setAuthToken($db, $user_name);
+    setcookie('token', $token, time() + $timeout);
+}
+
+
+session_start();
+session_regenerate_id(true);
 
 
 //ログイン認証

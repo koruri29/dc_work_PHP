@@ -2,15 +2,16 @@
 require_once ('../../include/model/ec_getDb.php');
 require_once ('../../include/model/ec_common.php');
 require_once ('../../include/model/ec_sql.php');
+require_once ('../../include/model/ec_product.php');
 require_once ('../../include/model/ec_user.php');
 
 
 $db = getDb();
 
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $timeout = setSessionTimeout($db);
-    $token = setAuthToken($db);
+if ($user_name = checkAuthToken($db)) {
+    $timeout = setTimeout($db);
+    $token = setAuthToken($db, $user_name);
     setcookie('token', $token, time() + $timeout);
 }
 

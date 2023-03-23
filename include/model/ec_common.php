@@ -43,19 +43,16 @@ function setSession(array $user): void {
  */
 function isLogin(object $pdo): bool {
     if ($_SESSION['user_name']) {
-        print 'user_name効いてるよん';
         if ($_SESSION['expires'] > time()) {
-            print 'expires問題ないよん';
             return true;
         }
     }
 
     $user_name = checkAuthToken($pdo);
     if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
-        print 'いい分岐に入ったよ';
         $user = fetchUser($pdo, $user_name);
         setSession($user);
-        $token = setAuthToken($pdo);
+        $token = setAuthToken($pdo, $user_name);
         setcookie('token', $token, $_SESSION['expires']);
         createCart($pdo);
         $_SESSION['cart_id'] = lastInsertId($pdo);
@@ -66,7 +63,7 @@ function isLogin(object $pdo): bool {
 }
 
 
-function setSessionTimeout($pdo): int {
+function setTimeout($pdo): int {
     $timeout = 30 * 60;
     if ($_POST['auto-login'] == 'on' || checkAuthToken($pdo) !== false) {
         $timeout = 7 * 24 * 60 * 60;
