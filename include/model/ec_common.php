@@ -42,11 +42,7 @@ function setSession(array $user): void {
  * @return bool
  */
 function isLogin(object $pdo): bool {
-    if ($_SESSION['user_name']) {
-        if ($_SESSION['expires'] > time()) {
-            return true;
-        }
-    }
+    if (isSessionInEffect()) return true;
 
     $user_name = checkAuthToken($pdo);
     if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
@@ -63,12 +59,49 @@ function isLogin(object $pdo): bool {
 }
 
 
+/**
+ * 自動ログインがonか判断して、onならクッキーとトークンをセット
+ * 
+ * @param object $pdo
+ * @return int $timeout クッキー（セッション）の有効期限
+ */
+function setAutologin(object $pdo): int {
+    global $timeout;
+
+    if (isSessionInEffect()) return $timeout;
+
+    if ($_POST['auto-login'] == 'on') {
+        $timeout = setTimeout($pdo);
+        $token = setAuthToken($pdo, $_POST['user-name']);
+        setcookie('token', $token, time() + $timeout);
+        return $timeout;
+    }
+    if ($user_name = checkAuthToken($pdo)) {
+        $timeout = setTimeout($pdo);
+        $token = setAuthToken($pdo, $user_name);
+        setcookie('token', $token, time() + $timeout);
+        return $timeout;
+    }
+    return $timeout;
+}
+
+
+function isSessionInEffect() {
+    if ($_SESSION['user_name']) {
+        if ($_SESSION['expires'] > time()) {
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
+
 function setTimeout($pdo): int {
-    $timeout = 30 * 60;
-    if ($_POST['auto-login'] == 'on' || checkAuthToken($pdo) !== false) {
+    // if ($_POST['auto-login'] == 'on' || checkAuthToken($pdo) !== false) {
         $timeout = 7 * 24 * 60 * 60;
         session_set_cookie_params($timeout);
-    }
+    // }
     return $timeout;
 }
 

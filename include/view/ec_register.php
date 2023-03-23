@@ -10,9 +10,13 @@
 	<form action="./register.php" method="post">
 		<dl>
 			<dt>ユーザー名</dt>
-			<dd><input type="text" name="user-name" value="<?php if (! empty($post['user-name'] || empty($msg['registered']))) print $post['user-name']; ?>"></dd>
+			<dd>
+				<input type="text" name="user-name"
+					value="<?php if (! empty($post['user-name'] || empty($msg['registered']))) print $post['user-name']; ?>"
+			 		placeholder="英数字5文字以上">
+			</dd>
 			<dt>パスワード</dt>
-			<dd><input type="password" name="password"></dd>
+			<dd><input type="password" name="password" placeholder="英数字8文字以上"></dd>
 			<input type="submit" value="登録">
 		</dl>
 	</form>

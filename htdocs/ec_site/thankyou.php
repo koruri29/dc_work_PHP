@@ -9,15 +9,13 @@ require_once ('../../include/model/ec_user.php');
 $db = getDb();
 
 
-if ($user_name = checkAuthToken($db)) {
-    $timeout = setTimeout($db);
-    $token = setAuthToken($db, $user_name);
-    setcookie('token', $token, time() + $timeout);
-}
-
+//クッキー（セッション）の期限
+$timeout = 30 * 60;
 
 session_start();
 session_regenerate_id(true);
+
+setAutologin($db);//自動ログインがonならクッキーとトークンをセット
 
 
 //ログイン認証

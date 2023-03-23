@@ -75,7 +75,7 @@ function validatePassword(string $password): void {
  * @return void 
  */
 function authUser(object $pdo): void {
-    global $error;
+    global $error;print 'authUserに来たよ～';
 
     $user = fetchUser($pdo, $_POST['user-name']);
 

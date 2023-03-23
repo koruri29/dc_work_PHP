@@ -9,15 +9,20 @@ require_once ('../../include/model/ec_user.php');
 $db = getDb();
 
 
-if ($user_name = checkAuthToken($db)) {
-    $timeout = setTimeout($db);
-    $token = setAuthToken($db, $user_name);
-    setcookie('token', $token, time() + $timeout);
-}
-
+//セッション（クッキー）の期限
+$timeout = 30 * 60;
 
 session_start();
 session_regenerate_id(true);
+
+setAutologin($db);//自動ログインがonならクッキーとトークンをセット
+
+
+$error = array();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    authUser($db);//ログイン成功なら同時にカートも作成
+}
 
 
 if (isLogin($db)) {
@@ -26,11 +31,7 @@ if (isLogin($db)) {
 }
 
 
-$error = array();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    authUser($db);//ログイン成功なら同時にカートも作成
-}
 
 
 include_once ('../../include/view/ec_head.html');
