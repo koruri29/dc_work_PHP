@@ -44,12 +44,24 @@ isStockAvailable($db);
 $total = calcTotal($db, 'fetchAllInCart');
 
 
-//購入ボタンを表示するか（カートに商品が入っているか）
+//数量変更ボタンを表示するか（カートに商品が入っているか）
 $stmt = fetchAllInCart($db);
 if ($stmt->fetch(PDO::FETCH_ASSOC)) {
-    $does_show_button = true;
+    $show_change_btn = true;
 } else {
-    $does_show_button = false;
+    $show_change_btn = false;
+}
+
+//購入ボタンを表示するか
+$stmt = fetchAllInCart($db);
+if ($stmt->fetch(PDO::FETCH_ASSOC)) {
+    if (isset($error['stock'])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
+        $show_purchase_btn = false;
+    } else {
+        $show_purchase_btn = true;
+    }
+} else {
+    $show_purchase_btn = false;
 }
 
 include_once ('../../include/view/ec_head.html');

@@ -42,7 +42,13 @@ function setSession(array $user): void {
  * @return bool
  */
 function isLogin(object $pdo): bool {
-    if (isSessionInEffect()) return true;
+    if (isSessionInEffect()) {
+        if ($_SESSION['user_name'] == 'ec_admin' && ! $_SERVER['REQUEST_URI'] == 'edit.php') {
+            header('Location: edit.php');
+            exit();
+        }
+        return true;
+    }
 
     $user_name = checkAuthToken($pdo);
     if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
@@ -52,6 +58,7 @@ function isLogin(object $pdo): bool {
         setcookie('token', $token, $_SESSION['expires']);
         createCart($pdo);
         $_SESSION['cart_id'] = lastInsertId($pdo);
+        setCartIdToAutologin($pdo);
         return true;
     } else {
         return false;
@@ -97,11 +104,14 @@ function isSessionInEffect() {
 }
 
 
-function setTimeout($pdo): int {
-    // if ($_POST['auto-login'] == 'on' || checkAuthToken($pdo) !== false) {
+/**
+ * セッション（クッキー)の期限を設定
+ * 
+ * @return int $timeout セッション（クッキー)の期限
+ */
+function setTimeout(): int {
         $timeout = 7 * 24 * 60 * 60;
         session_set_cookie_params($timeout);
-    // }
     return $timeout;
 }
 
@@ -128,8 +138,12 @@ function checkAuthToken(object $pdo) {
  *-------------------------*/
 function searchProduct(object $pdo): object {
     //文字列を整える
-    $hankaku = mb_convert_kana($_POST['search'], 's', 'utf-8');
-    $words = preg_split('/[\s]/', $hankaku);
+    if (empty($_POST['search'])) {
+        $words = array();
+    } else {
+        $hankaku = mb_convert_kana($_POST['search'], 's', 'utf-8');
+        $words = preg_split('/[\s]/', $hankaku);
+    }
 
     if ($_POST['and-or'] == 'and') {
         return andSearch($pdo, $words);

@@ -180,23 +180,6 @@ function fetchAllProduct(object $pdo): object {
 
 
 /**
- * 商品テーブルに登録の商品の種類数をカウント
- * 
- * 商品編集画面で、フォームで飛ばすために商品の総種類数を数える
- * 
- * @param object $pdo
- * @return int $product_num 商品テーブルに登録されている商品の種類数
- */
-function countAllProduct(object $pdo): int {
-    $sql = 'SELECT COUNT(*) AS cnt FROM EC_product WHERE 1 = 1;';
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $count = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    return $count['cnt'];
-}
-
-/**
  * postされた画像ファイルをデータベースへ挿入
  * 
  * @param object $pdo
@@ -242,29 +225,29 @@ function insertImage(object $pdo): void {
  * @return bool 挿入が成功すればtrue
  */
 function insertProduct(object $pdo, int $last_insert_id):bool {
+    $sql = <<<SQL
+        INSERT INTO
+        EC_product (
+            product_name,
+            price,
+            qty,
+            image_id,
+            public_flag,
+            created_at,
+            updated_at
+        ) VALUES (
+            :name,
+            :price,
+            :qty,
+            :image_id,
+            :flag,
+            :created_at,
+            :updated_at
+        );
+    SQL;
+
     try {
         $pdo->beginTransaction();
-
-        $sql = <<<SQL
-            INSERT INTO
-            EC_product (
-                product_name,
-                price,
-                qty,
-                image_id,
-                public_flag,
-                created_at,
-                updated_at
-            ) VALUES (
-                :name,
-                :price,
-                :qty,
-                :image_id,
-                :flag,
-                :created_at,
-                :updated_at
-            );
-        SQL;
         
         $stmt = $pdo->prepare($sql);
         $date = date('Y-m-d');
@@ -364,10 +347,10 @@ function updateFlag(object $pdo, int $id): void {
 
         if ($stmt->rowCount() > 0) {            
             if ($flag === 0) {
-            $msg_update = array_merge($msg_update, ['display' => '公開に変更しました。']);
-                } else {
-            $msg_update = array_merge($msg_update, ['non-display' => '非公開に変更しました。']);
-                }
+                $msg_update = array_merge($msg_update, ['display' => '公開に変更しました。']);
+            } else {
+                $msg_update = array_merge($msg_update, ['non-display' => '非公開に変更しました。']);
+            }
         }
     } catch (PDOException $e) {
         $pdo->rollback();
@@ -421,6 +404,25 @@ function getPublicFlag(object $pdo, int $id): int {
 
     return $rec['public_flag'];
 }
+
+
+/**
+ * 商品テーブルに登録の商品の種類数をカウント
+ * 
+ * 商品編集画面で、フォームで飛ばすために商品の総種類数を数える
+ * 
+ * @param object $pdo
+ * @return int $count['cnt'] 商品テーブルに登録されている商品の種類数
+ */
+function countAllProduct(object $pdo): int {
+    $sql = 'SELECT COUNT(*) AS cnt FROM EC_product WHERE 1 = 1;';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $count = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $count['cnt'];
+}
+
 
 /*-------------------------
  * product.php
@@ -611,11 +613,11 @@ function newlyAddToCart(object $pdo): void {
         $sql = <<<SQL
             INSERT INTO
                 EC_cart_detail (
-                    cart_id,
-                    product_id,
-                    qty,
-                    created_at,
-                    updated_at
+                cart_id,
+                product_id,
+                qty,
+                created_at,
+                updated_at
             ) VALUES (
                 :cart_id,
                 :product_id,
@@ -909,9 +911,9 @@ function getSales(object $pdo): object {
  * 
  * @param object $pdo
  * @param array $words 検索ワードを配列化したもの
- * @return object $stmt 検索結果のデータ
+ * @return object|null $stmt 検索結果のデータ
  */
-function andSearch(object $pdo, array $words): object {
+function andSearch(object $pdo, array $words) {
     $arr = array();
     $arr[] = <<<SQL
         SELECT *
@@ -925,13 +927,14 @@ function andSearch(object $pdo, array $words): object {
         $arr[] = ' AND product_name LIKE ';
     }
     $arr[count($words) * 2] = '';//最後のANDを削除
-
     $sql = implode('', $arr);
+    if (empty($words)) $sql = 'SELECT * FROM EC_product WHERE 1 = 0;';
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
 
     return $stmt;
 }
+
 /**
  * 公開中商品のOR検索機能
  * 
@@ -955,6 +958,7 @@ function orSearch(object $pdo, array $words): object {
     $arr[count($words) * 2] = '';//最後のORを削除
 
     $sql = implode('', $arr);
+    if (empty($words)) $sql = 'SELECT * FROM EC_product WHERE 1 = 0;';
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
 
@@ -985,11 +989,11 @@ function setAuthToken(object $pdo, string $user_name): string {
                 EC_autologin (
                     token,
                     user_name,
-                    expires
+                    expires,
                 ) VALUES (
                     :token,
                     :user_name,
-                    :expires
+                    :expires,
                 )
         SQL;
         $stmt = $pdo->prepare($sql);
@@ -1000,6 +1004,24 @@ function setAuthToken(object $pdo, string $user_name): string {
     
         $pdo->commit();
         return $token;
+    } catch (PDOException $e) {
+        $pdo->rollback();
+        echo $e->getMessage();
+        exit();
+    }
+}
+
+function setCartIdToAutologin(object $pdo): void {
+    try {
+        $pdo->beginTransaction();
+
+        $sql = 'UPDATE EC_autologin SET cart_id = :id WHERE token = :token';
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':id', $_SESSION['cart_id']);
+        $stmt->bindValue(':token', $_COOKIE['token']);
+        $stmt->execute();
+
+        $pdo->commit();
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();

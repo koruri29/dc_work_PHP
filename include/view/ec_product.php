@@ -1,6 +1,6 @@
 <body>
     <a href="./cart.php">カートを見る（<?php print countTotalProduct($db); ?>点）</a>
-    <?php if (isset($_POST['search'])): ?>
+    <?php if ($_POST['submit'] == '検索' || $product = null): ?>
         <a href="./product.php">商品一覧へ</a>
         <h2>検索結果</h2>
         <?php if (! empty($msg)) print '<p class="msg">' . $msg . '</p>'; ?>

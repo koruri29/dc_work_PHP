@@ -28,8 +28,6 @@ function showProductData(object $pdo): void {
         print '<tr>';
         print '<th>公開フラグ：</th>';
         print '<td class="display">';
-        // print '<input class="radioBtn" type="radio" name="display-flag" value="display" checked>表示する';
-        // print '<input class="radioBtn" type="radio" name="display-flag" value="non-display">非表示にする';
         if ($product['public_flag'] == 1) {
             print '<span class="displayed">公開中です</span><br>';
         } else {
@@ -58,7 +56,8 @@ function showProductData(object $pdo): void {
  */
 function proceedUpdateProduct(object $pdo): void {
     for ($i = 0; $i <$_POST['product-num']; $i++) {
-        if (! validateUpdatedProduct($_POST['qty' . $i], $_POST['public_flag' . $i])) return;
+        if (! validateUpdatedProduct($_POST['qty' . $i])) return;
+
         $rec = fetchOneFromProduct($pdo, $_POST['product-id' . $i]);
         $current_qty = $rec['qty'];
         if ($_POST['qty' . $i] != $current_qty){
@@ -73,6 +72,7 @@ function proceedUpdateProduct(object $pdo): void {
     }
 }
 
+
 /**
  * 画像と商品データの登録
  * 
@@ -83,8 +83,8 @@ function registerProduct(object $pdo): void {
     global $msg_register;
     global $error_register;
 
-    validateImage();
-    validateProduct();
+    // validateProduct();
+    // validateImage();
 
     if (empty($error_register)) {
         if (
@@ -102,20 +102,10 @@ function registerProduct(object $pdo): void {
         return;
     }
 
-    if (empty($error_register)) {
-        insertImage($pdo);
-        $last_insert_id = lastInsertId($pdo);
-    } else {
-        return;
-    }
+    insertImage($pdo);
+    $last_insert_id = lastInsertId($pdo);
 
-    if (insertProduct($pdo, $last_insert_id)) {
-        //
-    } else {
-        $error_register = array_merge($error_register, ['insert_product' => '商品の登録に失敗しました。']);
-        return;
-    }
-
+    insertProduct($pdo, $last_insert_id);
     $msg_register = '商品の登録が完了しました。';
 }
 
@@ -141,49 +131,31 @@ function validateImage(): void {
 /**
  * 商品登録の際のバリデーションチェック
  * 
- * @return bool 未入力や不正な値がなければtrue
+ * @return void
  */
-function validateProduct(): bool {
+function validateProduct(): void {
     global $error_register;
-    $flag = true;
     
     if (empty($_POST['name'])) {
         $error_register = array_merge($error_register, ['name_empty' => '商品名が入力されていません。']);
-        $flag = false;
     }
     if ($_POST['price'] === '') {
         $error_register = array_merge($error_register, ['price_empty' => '価格が入力されていません。']);
-        $flag = false;
     }
     if (! is_numeric($_POST['price'])) {
         $error_register = array_merge($error_register, ['price_not_num' => '価格は半角数字で入力してください。']);
-        $flag = false;
     }
     if ($_POST['price'] < 0) {
         $error_register = array_merge($error_register, ['price_minus' => '価格は正の整数を入力してください。']);
-        $flag = false;
     }
     if ($_POST['qty'] === '') {
         $error_register = array_merge($error_register, ['qty_empty' => '在庫数が入力されていません。']);
-        $flag = false;
     }
     if (! is_numeric($_POST['qty'])) {
         $error_register = array_merge($error_register, ['qty_not_num' => '在庫数は半角数字で入力してください。']);
-        $flag = false;
     }
     if ($_POST['qty'] < 0) {
         $error_register = array_merge($error_register, ['qty_minus' => '在庫数は正の整数を入力してください。']);
-        $flag = false;
-    }
-    // if ($_POST['public_flag'] === 0 | $_POST['public_flag'] === 1) {
-    //     $error_register = array_merge($error_register, ['flag_empty' => '公開ステータスを選択してください']);
-    //     $flag = false;
-    // }
-
-    if ($flag === true) {
-        return true;
-    } else {
-        return false;
     }
 }
 
@@ -193,7 +165,7 @@ function validateProduct(): bool {
  * 
  * @return bool 未入力や不正な値がなければtrue
  */
-function validateUpdatedProduct($qty, $public_flag): bool {
+function validateUpdatedProduct($qty): bool {
     global $error_update;
 
     $flag = true;
@@ -210,10 +182,6 @@ function validateUpdatedProduct($qty, $public_flag): bool {
         $error_update = array_merge($error_update, ['qty_minus' => '在庫数は正の整数を入力してください。']);
         $flag = false;
     }
-    // if ($public_flag === 0 | $public_flag === 1) {
-    //     $error_update = array_merge($error_update, ['flag_empty' => '公開ステータスを選択してください']);
-    //     $flag = false;
-    // }
 
     if ($flag === true) {
         return true;
@@ -235,6 +203,11 @@ function validateUpdatedProduct($qty, $public_flag): bool {
 function showPublicProduct(object $stmt): void {
     global $error;
     $flag = false;
+
+    if ($stmt === null) {
+        $error = '検索結果は0件です。';
+        return;
+    }
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $flag = true;
         $product = sanitize($product);
@@ -370,24 +343,19 @@ function validateQty(): bool {
     global $error;
     global $product_num;
 
-    $flag = true;
-    
     for ($i = 0; $i < $product_num; $i++) {
         if ($_POST['qty' . $i] === '') {
             $error = array_merge($error, ['qty_empty' => '数量が入力されていません。']);
-            $flag = false;
         }
         if (! is_numeric($_POST['qty' . $i])) {
             $error = array_merge($error, ['qty_not_num' => '数量は半角数字で入力してください。']);
-            $flag = false;
         }
         if ($_POST['qty' . $i] < 0) {
             $error = array_merge($error, ['qty_minus' => '数量は正の整数で入力してください。']);
-            $flag = false;
         }
     }
 
-    if ($flag === true) {
+    if (count($error) === 0) {
         return true;
     } else {
         return false;

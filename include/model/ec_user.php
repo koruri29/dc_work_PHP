@@ -71,16 +71,16 @@ function validatePassword(): void {
  * @return void 
  */
 function authUser(object $pdo): void {
-    global $error;print 'authUserに来たよ～';
+    global $error;
 
     $user = fetchUser($pdo, $_POST['user-name']);
 
     if ($user == false) {
-        $error  = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
+        $error = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
         return;
     }
     if (! password_verify($_POST['password'], $user['password'])) {
-        $error  = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
+        $error = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
         return;
     }
 
@@ -92,6 +92,7 @@ function authUser(object $pdo): void {
     } else {
         createCart($pdo);//ログイン時にカートを作成
         $_SESSION['cart_id'] = lastInsertId($pdo);
+        setCartIdToAutologin($pdo);
         header('Location: product.php');
         exit();   
     }

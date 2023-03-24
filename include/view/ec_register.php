@@ -22,5 +22,4 @@
 			<input id="register-user" type="submit" value="登録">
 		</dl>
 	</form>
-	<script src="../../0006/js/main.js"></script>
 	<script src="../../0006/js/register.js"></script>

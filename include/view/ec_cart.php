@@ -11,12 +11,12 @@
 <form action="./cart.php" method="post">
     <?php showProductInCart($db); ?>
     <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
-    <?php if ($does_show_button): ?>
+    <?php if ($show_change_btn): ?>
         <input type="submit" name="submit" value="数量変更">
     <?php endif; ?>
 </form>
 <p>合計金額：<?php print $total; ?>円</p>
-<?php if ($does_show_button): ?>
+<?php if ($show_purchase_btn): ?>
     <form action="./thankyou.php" method="post">
         <input type="submit" value="購入する">
     </form>

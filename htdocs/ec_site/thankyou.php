@@ -27,7 +27,7 @@ if (! isLogin($db)) {
 
 $msg = array();
 
-//LOCK TABLES
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt = fetchAllInCart($db);
     proceedSales($db, $stmt);

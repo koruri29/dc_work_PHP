@@ -43,5 +43,4 @@
         <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
         <input id="update-product" name="send" type="submit" value="設定を変更する">
     </form>
-    <script src="../../0006/js/main.js"></script>
 	<script src="../../0006/js/edit.js"></script>
