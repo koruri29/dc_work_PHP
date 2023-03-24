@@ -2,7 +2,7 @@
     <h2 class="h2">商品登録</h2>
     <?php if (! empty($msg_register)) print '<p class="msg">' . $msg_register . '</p>'; ?>
 
-    <form id="register" action="./edit.php" method="post" enctype="multipart/form-data">
+    <form id="register" name="register" action="./edit.php" method="post" enctype="multipart/form-data">
         商品名<input id="product-name" type="text" name="name"><br>
         価格<input id="price" type="number" name="price"><br>
         在庫数<input id="qty" type="number" name="qty"><br>
@@ -38,10 +38,10 @@
             }
         ?>
     </div>
-    <form id="update" action="./edit.php" method="post">
+    <form id="update" name ="update" action="./edit.php" method="post">
         <?php showProductData($db); ?>
         <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
-        <input id="update-product" name="submit" type="submit" value="設定を変更する">
+        <input id="update-product" name="send" type="submit" value="設定を変更する">
     </form>
     <script src="../../0006/js/main.js"></script>
 	<script src="../../0006/js/edit.js"></script>

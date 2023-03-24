@@ -9,20 +9,18 @@
  * 
  * @return void 
  */
-function checkUserThenResister(): void {
+function checkUserThenResister($pdo): void {
     global $error;
     global $msg;
     
-    $pdo = getDb();
+    validateUserName();
+    validatePassword();
 
-    validateUserName($_POST['user-name']);
-    validatePassword($_POST['password']);
-
-    if (isExistingUserName($pdo, $_POST['user-name'])) {
+    if (isExistingUserName($pdo)) {
         $error = array_merge($error, ['existing_user_name' => 'すでに登録されているユーザー名です。']);
     }
     if (empty($error)) {
-        if (insertUser($pdo, $_POST['user-name'], $_POST['password'])) {
+        if (insertUser($pdo)) {
             $msg = '登録が完了しました。';
         } else {
             $error = array_merge($error, ['register' => '登録に失敗しました。管理者にお問い合わせください。']);
@@ -34,12 +32,11 @@ function checkUserThenResister(): void {
 /**
  * ユーザー名のバリデーション
  * 
- * @param string $userName
  * @return void
  */
-function validateUserName(string $userName): void {
+function validateUserName(): void {
     global $error;
-    if (preg_match('/^[a-zA-Z0-9]{5,}+$/', $userName)) {
+    if (preg_match('/^[a-zA-Z0-9]{5,}$/', $_POST['user-name'])) {
         //
     } else {
         $error = array_merge($error, ['user_name' => 'ユーザー名は半角英数字5文字以上で入力してください。']);
@@ -49,12 +46,11 @@ function validateUserName(string $userName): void {
 /**
  * パスワードのバリデーション
  * 
- * @param string $password
  * @return void
  */
-function validatePassword(string $password): void {
+function validatePassword(): void {
     global $error;
-    if (preg_match('/^[a-zA-Z0-9]{8,}+$/', $password)) {
+    if (preg_match('/^[a-zA-Z0-9]{8,}$/', $_POST['password'])) {
         //
     } else {
         $error = array_merge($error, ['password' => 'パスワードは半角英数字8文字以上で入力してください。']);

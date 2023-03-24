@@ -9,10 +9,19 @@ const div = document.getElementsByClassName('show-msg')[0];
 
 
 function validateUser(error) {
+	const namePattern = /^[a-zA-Z0-9]{5,}$/
+	const passwordPattern = /^[a-zA-Z0-9]{8,}$/
+
 	if (userName.value === '') {
 		error.push('ユーザー名は半角英数字5文字以上で入力してください。');
 	}
+	if (! namePattern.test(userName.value)) {
+		error.push('ユーザー名は半角英数字5文字以上で入力してください。');
+	}
 	if (password.value === '') {
+		error.push('パスワードは半角英数字8文字以上で入力してください。');
+	}
+	if (! passwordPattern.test(password.value)) {
 		error.push('パスワードは半角英数字8文字以上で入力してください。');
 	}
 	return error;

@@ -28,7 +28,7 @@ $error = array();
 $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    checkUserThenResister();
+    checkUserThenResister($db);
 }
 
 
