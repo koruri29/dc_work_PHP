@@ -18,24 +18,6 @@ function lastInsertId(object $pdo): int {
 }
 
 
-// /**
-//  * データベースからユーザー情報を取得する関数
-//  * 
-//  * @param object $pdo
-//  * @param int $id ユーザーID
-//  * @return array|bool データがあれば配列。なければfalse
-//  */
-// function fetchUserByName(object $pdo) {
-//     $sql = 'SELECT * FROM EC_user WHERE user_name = :name;';
-//     $stmt = $pdo->prepare($sql);
-//     $stmt->bindValue(':name', $_SESSION['user_name']);
-//     $stmt->execute();
-
-//     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-//     return $user;
-// }
-
-
 /*-------------------------
  * register.php
  *-------------------------*/
@@ -99,10 +81,10 @@ function insertUser(object $pdo): bool {
  * @param string $userName
  * @return array|bool データがあれば配列。なければfalse
  */
-function fetchUser(object $pdo, string $userName) {
+function fetchUser(object $pdo, string $user_name) {
     $sql = 'SELECT * FROM EC_user WHERE user_name = :name;';
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':name', $userName);
+    $stmt->bindValue(':name', $user_name);
     $stmt->execute();
 
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -117,21 +99,22 @@ function fetchUser(object $pdo, string $userName) {
  * @return void
  */
 function createCart(object $pdo): void {
+    $sql = <<<SQL
+        INSERT INTO
+            EC_cart (
+                user_name,
+                created_at,
+                updated_at
+        ) VALUES (
+            :user_name,
+            :created_at,
+            :updated_at
+        );
+    SQL;
+
     try {
         $pdo->beginTransaction();
 
-        $sql = <<<SQL
-            INSERT INTO
-                EC_cart (
-                    user_name,
-                    created_at,
-                    updated_at
-            ) VALUES (
-                :user_name,
-                :created_at,
-                :updated_at
-            );
-        SQL;
         $stmt = $pdo->prepare($sql);
         $date = date('Y-m-d');
         $stmt->bindValue(':user_name', $_SESSION['user_name']);
@@ -155,7 +138,7 @@ function createCart(object $pdo): void {
  * データベースからすべての商品データを取得
  * 
  * @param object $pdo
- * @return object $products 商品データ
+ * @return object $stmt 商品データ
  */
 function fetchAllProduct(object $pdo): object {
     $sql = <<<SQL
@@ -186,21 +169,21 @@ function fetchAllProduct(object $pdo): object {
  * @return void
  */
 function insertImage(object $pdo): void {
+    $sql = <<<SQL
+        INSERT INTO
+            EC_image (
+                image_name,
+                created_at,
+                updated_at
+            ) VALUES (
+                :name,
+                :created_at,
+                :updated_at
+            );
+    SQL;
+
     try {
         $pdo->beginTransaction();
-
-        $sql = <<<SQL
-            INSERT INTO
-                EC_image (
-                    image_name,
-                    created_at,
-                    updated_at
-                ) VALUES (
-                    :name,
-                    :created_at,
-                    :updated_at
-                );
-        SQL;
 
         $stmt = $pdo->prepare($sql);
         $date = date('Y-m-d');
@@ -291,6 +274,7 @@ function updateStock(object $pdo, int $id, int $qty): void {
         WHERE
             product_id = :id
     SQL;
+
     try {
         $pdo->beginTransaction();
 
@@ -334,6 +318,7 @@ function updateFlag(object $pdo, int $id): void {
         WHERE
             product_id = :id
     SQL;
+
     try {
         $pdo->beginTransaction();
 
@@ -369,6 +354,7 @@ function updateFlag(object $pdo, int $id): void {
 function deleteProduct(object $pdo, int $id): void {
     global $msg_update;
     $sql = 'DELETE FROM EC_product WHERE product_id = :id;';
+
     try {
         $pdo->beginTransaction();
 
@@ -391,7 +377,7 @@ function deleteProduct(object $pdo, int $id): void {
 /**
  * 公開フラグ情報を取得する
  * 
- * @param $pdo
+ * @param object $pdo
  * @param int $id 商品ID
  * @return int 公開フラグ情報（1は公開、0は非公開）
  */
@@ -430,7 +416,7 @@ function countAllProduct(object $pdo): int {
 /**
  * データベースから公開フラグが「公開」の商品情報を取得する
  * 
- * @param $pdo
+ * @param object $pdo
  * @return object $stmt 公開フラグが「公開」の商品情報一式
  */
 function fetchPublicProduct(object $pdo): object {
@@ -497,61 +483,6 @@ function countProductInCart(object $pdo): int {
 
 
 /**
- * カート内の商品の数量変更または削除の関数
- * 
- * @param object $pdo
- * @return void
- */
-function changeQtyInCart(object $pdo): void {
-    for ($i = 0; $i < $_POST['product-num']; $i++) {
-        $rec = fetchOneInCart($pdo, $_POST['product-id' . $i]);
-        $current_qty = $rec['qty'];
-    
-        if (($_POST['delete' . $i])) {
-            deleteProductInCart($pdo, $_POST['product-id' . $i]);
-        }
-        if ($_POST['qty' . $i] === $current_qty) {  
-            //
-        } else {
-            $qty = getNewQty($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);
-            updateQty($pdo, $_POST['product-id' . $i], $qty);
-        }
-    }
-}
-
-
-/**
- * カート内商品テーブルと在庫数を比べて、適切な数量を設定する
- * 
- * @param object $pdo
- * @param int $id 商品ID
- * @param int|null $posted_qty 入力された数量。入力がなければnull
- * @return int $changed_qty 変更したい数量
- */
-function getNewQty(object $pdo, int $id, $posted_qty = null): int {
-    $product = fetchOneInCart($pdo, $id);
-    $current_qty = $product['qty'];
-   
-    $product = fetchOneFromProduct($pdo, $id);
-    $max_qty = $product['qty'];
-    if ($posted_qty !== null) {
-        if ($posted_qty >= $max_qty) {
-            $changed_qty = $max_qty;
-        } else {
-            $changed_qty = $posted_qty;
-        }
-        return $changed_qty;
-    }
-
-    if ($current_qty + 1 >= $max_qty) {
-        $changed_qty = $max_qty;
-    } else {
-        $changed_qty = $current_qty + 1;
-    }
-    return $changed_qty;
-}
-
-/**
  * カート内の商品を削除する関数
  * 
  * @param object $pdo
@@ -559,20 +490,23 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
  * @return void
  */
 function deleteProductInCart(object $pdo, int $id): void {
+    $sql = <<<SQL
+        DELETE FROM
+            EC_cart_detail
+        WHERE
+            cart_id = :cart_id
+        AND
+            product_id = :product_id;
+    SQL;
+
     try {
         $pdo->beginTransaction();
-        $sql = <<<SQL
-            DELETE FROM
-                EC_cart_detail
-            WHERE
-                cart_id = :cart_id
-            AND
-                product_id = :product_id;
-        SQL;
+
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
         $stmt->bindValue(':product_id', $id);
         $stmt->execute();
+
         $pdo->commit();
     } catch (PDOException $e) {
         $pdo->rollback();
@@ -583,23 +517,6 @@ function deleteProductInCart(object $pdo, int $id): void {
 
 
 /**
- * 「カートに入れる」ボタン押下時、商品がすでにカートに入っているか判断
- * 
- * 該当の商品は$_POST['product-id']で受けることを想定
- * 
- * @param object $pdo
- * @return bool 指定の商品がすでにカートに入っていればtrue
- */
-function doesExistInCart(object $pdo): bool {
-    $product = FetchOneInCart($pdo, $_POST['product-id']);
-    if ($product['product_id'] !== null) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/**
  * カートにない商品をカートに入れる場合
  * 
  * @param object $pdo
@@ -607,25 +524,26 @@ function doesExistInCart(object $pdo): bool {
  */
 function newlyAddToCart(object $pdo): void {
     global $msg;
+    $sql = <<<SQL
+        INSERT INTO
+            EC_cart_detail (
+            cart_id,
+            product_id,
+            qty,
+            created_at,
+            updated_at
+        ) VALUES (
+            :cart_id,
+            :product_id,
+            :qty,
+            :created_at,
+            :updated_at
+        );
+    SQL;
+
     try {
         $pdo->beginTransaction();
 
-        $sql = <<<SQL
-            INSERT INTO
-                EC_cart_detail (
-                cart_id,
-                product_id,
-                qty,
-                created_at,
-                updated_at
-            ) VALUES (
-                :cart_id,
-                :product_id,
-                :qty,
-                :created_at,
-                :updated_at
-            );
-        SQL;
         $stmt = $pdo->prepare($sql);
         $date = date('Y-m-d');
         $stmt->bindValue(':cart_id', $_SESSION['cart_id']);
@@ -654,19 +572,21 @@ function newlyAddToCart(object $pdo): void {
  */
 function updateQty(object $pdo, int $id, int $qty): void {
     global $msg;
+    $sql = <<<SQL
+        UPDATE
+            EC_cart_detail
+        SET
+            qty = :qty,
+            updated_at = :updated_at
+        WHERE
+            cart_id = :cart_id
+        AND
+            product_id = :product_id;
+    SQL;
+
     try {
         $pdo->beginTransaction();
-        $sql = <<<SQL
-            UPDATE
-                EC_cart_detail
-            SET
-                qty = :qty,
-                updated_at = :updated_at
-            WHERE
-                cart_id = :cart_id
-            AND
-                product_id = :product_id;
-        SQL;
+
         $stmt = $pdo->prepare($sql);
         $date = date('Y-m-d');
         $stmt->bindValue(':qty', $qty, PDO::PARAM_INT);
@@ -689,6 +609,7 @@ function updateQty(object $pdo, int $id, int $qty): void {
  * カート内から指定の1商品の情報を取得
  * 
  * @param object $pdo
+ * @param int $id 商品ID
  * @return object $stmt カート内の指定の1商品の情報
  */
 function fetchOneInCart(object $pdo, int $id) {
@@ -777,6 +698,7 @@ function insertSales(object $pdo, array $product): void {
             :updated_at
         )
     SQL;
+
     try {
         $pdo->beginTransaction();
   
@@ -790,7 +712,6 @@ function insertSales(object $pdo, array $product): void {
         $stmt->execute();
 
         $pdo->commit();
-
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
@@ -861,9 +782,9 @@ function fetchAllInCart(object $pdo) {
  * @return void
  */
 function clearCart(object $pdo): void {
+        $sql = 'DELETE FROM EC_cart_detail WHERE cart_id = :id;';
     try {
         $pdo->beginTransaction();
-        $sql = 'DELETE FROM EC_cart_detail WHERE cart_id = :id;';
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':id', $_SESSION['cart_id']);
         $stmt->execute();
@@ -940,9 +861,9 @@ function andSearch(object $pdo, array $words) {
  * 
  * @param object $pdo
  * @param array $words 検索ワードを配列化したもの
- * @return object $stmt 検索結果のデータ
+ * @return object|null $stmt 検索結果のデータ
  */
-function orSearch(object $pdo, array $words): object {
+function orSearch(object $pdo, array $words) {
     $arr = array();
     $arr[] = <<<SQL
         SELECT *
@@ -976,26 +897,28 @@ function orSearch(object $pdo, array $words): object {
  * ユーザーID・有効期限とともに自動ログインテーブルにセットする。
  * 
  * @param object $pdo
+ * @param string $user_name ユーザー名
  * @return string $token トークン（乱数）
  */
 function setAuthToken(object $pdo, string $user_name): string {
     global $timeout;
     $token = bin2hex(random_bytes(100));
+    $sql = <<<SQL
+        INSERT INTO
+            EC_autologin (
+                token,
+                user_name,
+                expires,
+            ) VALUES (
+                :token,
+                :user_name,
+                :expires,
+            )
+    SQL;
+
     try {
         $pdo->beginTransaction();
     
-        $sql = <<<SQL
-            INSERT INTO
-                EC_autologin (
-                    token,
-                    user_name,
-                    expires,
-                ) VALUES (
-                    :token,
-                    :user_name,
-                    :expires,
-                )
-        SQL;
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':token', $token);
         $stmt->bindValue(':user_name', $user_name);
@@ -1011,11 +934,18 @@ function setAuthToken(object $pdo, string $user_name): string {
     }
 }
 
+
+/**
+ * 自動ログイン時、カートIDをセットする
+ * 
+ * @param object $pdo
+ * @return void
+ */
 function setCartIdToAutologin(object $pdo): void {
+        $sql = 'UPDATE EC_autologin SET cart_id = :id WHERE token = :token';
     try {
         $pdo->beginTransaction();
 
-        $sql = 'UPDATE EC_autologin SET cart_id = :id WHERE token = :token';
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':id', $_SESSION['cart_id']);
         $stmt->bindValue(':token', $_COOKIE['token']);
@@ -1030,11 +960,11 @@ function setCartIdToAutologin(object $pdo): void {
 }
 
 /**
-* 自動ログインテーブルから、該当するトークンのレコードを取得
-* 
-* @param object $pdo
-* @return object $stmt
-*/
+ * 自動ログインテーブルから、該当するトークンのレコードを取得
+ * 
+ * @param object $pdo
+ * @return object $stmt
+ */
 function fetchAutoLogin(object $pdo): object {
     $sql = 'SELECT * FROM EC_autologin WHERE token = :token';
     $stmt = $pdo->prepare($sql);
@@ -1045,11 +975,17 @@ function fetchAutoLogin(object $pdo): object {
 }
 
 
+/**
+ * ログアウト時、登録済みのトークンを削除する
+ * 
+ * @param object $pdo
+ * @return void
+ */
 function deleteToken (object $pdo): void {
+        $sql = 'DELETE FROM EC_autologin WHERE token = :token;';
     try {
         $pdo->beginTransaction();
 
-        $sql = 'DELETE FROM EC_autologin WHERE token = :token;';
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':token', $_COOKIE['token']);
         $stmt->execute();

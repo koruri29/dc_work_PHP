@@ -219,15 +219,15 @@ function showPublicProduct(object $stmt): void {
         print '<tr><th>在庫数：</th><td>' . $product['qty'] . '点</td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '">';
-        //print '<button type="submit">カートに入れる</button>';
         if ($product['qty'] == 0) {
             print '<p class="sold-out">売り切れ</p>';
         } else {
-        print '<form action="./product.php" method="post">';
-        print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
-        print '<input class="submit" type="submit" name="submit" value="カートに入れる">';
-        print '</form>';
-    }
+            print '<form class="cart-in-form" name="cartInForm" action="./product.php" method="post">';
+            print '<input type="hidden" name="product-id" value="' . $product['product_id'] . '">';
+            print '<input type="hidden" name="cart-in" value="on">';
+            print '<input class="cart-in-btn" type="submit" name="send" value="カートに入れる">';
+            print '</form>';
+        }
         print '</div>';
     }
     if (! $flag) $error = '検索結果は0件です。';
@@ -284,6 +284,62 @@ function showProductInCart(object $pdo): void {
 
 
 /**
+ * カート内の商品の数量変更または削除の関数
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function changeQtyInCart(object $pdo): void {
+    for ($i = 0; $i < $_POST['product-num']; $i++) {
+        $rec = fetchOneInCart($pdo, $_POST['product-id' . $i]);
+        $current_qty = $rec['qty'];
+    
+        if (($_POST['delete' . $i])) {
+            deleteProductInCart($pdo, $_POST['product-id' . $i]);
+        }
+        if ($_POST['qty' . $i] === $current_qty) {  
+            //
+        } else {
+            $qty = getNewQty($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);
+            updateQty($pdo, $_POST['product-id' . $i], $qty);
+        }
+    }
+}
+
+
+/**
+ * カート内商品テーブルと在庫数を比べて、適切な数量を設定する
+ * 
+ * @param object $pdo
+ * @param int $id 商品ID
+ * @param int|null $posted_qty 入力された数量。入力がなければnull
+ * @return int $changed_qty 変更したい数量
+ */
+function getNewQty(object $pdo, int $id, $posted_qty = null): int {
+    $product = fetchOneInCart($pdo, $id);
+    $current_qty = $product['qty'];
+   
+    $product = fetchOneFromProduct($pdo, $id);
+    $max_qty = $product['qty'];
+    if ($posted_qty !== null) {
+        if ($posted_qty >= $max_qty) {
+            $changed_qty = $max_qty;
+        } else {
+            $changed_qty = $posted_qty;
+        }
+        return $changed_qty;
+    }
+
+    if ($current_qty + 1 >= $max_qty) {
+        $changed_qty = $max_qty;
+    } else {
+        $changed_qty = $current_qty + 1;
+    }
+    return $changed_qty;
+}
+
+
+/**
  * カート内の商品が売り切れたときのエラー表示
  * 
  * @param object $pdo
@@ -305,12 +361,12 @@ function isStockAvailable(object $pdo): void {
  * 合計金額の計算
  * 
  * @param object $pdo
- * @param calldable $funk データベースから商品郡を取得する関数
+ * @param calldable $func データベースから商品郡を取得する関数
  * @return int $total 合計金額
  */
-function calcTotal(object $pdo, callable $funk): int {
+function calcTotal(object $pdo, callable $func): int {
     $total = 0;
-    $stmt = $funk($pdo);
+    $stmt = $func($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $qty = $product['qty'];
         $product = fetchOneFromProduct($pdo, $product['product_id']);
@@ -330,6 +386,24 @@ function addToCart(object $pdo): void {
         updateQty($pdo, $_POST['product-id'], $qty);
     } else {
         newlyAddToCart($pdo);
+    }
+}
+
+
+/**
+ * 「カートに入れる」ボタン押下時、商品がすでにカートに入っているか判断
+ * 
+ * 該当の商品は$_POST['product-id']で受けることを想定
+ * 
+ * @param object $pdo
+ * @return bool 指定の商品がすでにカートに入っていればtrue
+ */
+function doesExistInCart(object $pdo): bool {
+    $product = FetchOneInCart($pdo, $_POST['product-id']);
+    if ($product['product_id'] !== null) {
+        return true;
+    } else {
+        return false;
     }
 }
 

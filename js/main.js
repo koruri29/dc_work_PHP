@@ -1,11 +1,3 @@
-submitBtn = document.getElementById('click-once');
-
-submitBtn.addEventListener('click', () => {
-	submitBtn.disabled = true;
-	document.form.submit();
-});
-
-
 function showError(error, elem) {
 	if (! error.length == 0) {
 		for (let i = 0; i < error.length; i++) {

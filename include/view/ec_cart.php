@@ -8,16 +8,18 @@
         }
     }
 ?>
-<form action="./cart.php" method="post">
+<form name="form1" action="./cart.php" method="post">
     <?php showProductInCart($db); ?>
     <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
     <?php if ($show_change_btn): ?>
-        <input type="submit" name="submit" value="数量変更">
+        <input id="qty-change" type="submit" name="send" value="数量変更">
     <?php endif; ?>
 </form>
 <p>合計金額：<?php print $total; ?>円</p>
 <?php if ($show_purchase_btn): ?>
-    <form action="./thankyou.php" method="post">
-        <input type="submit" value="購入する">
+    <form name="form2" action="./thankyou.php" method="post">
+        <input id="purchase" type="submit" value="購入する">
     </form>
 <?php endif; ?>
+<script src="../../0006/js/search.js"></script>
+<script src="../../0006/js/cart.js"></script>

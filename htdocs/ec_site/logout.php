@@ -9,7 +9,7 @@ require_once ('../../include/model/ec_sql.php');
 
 $db = getDb();
 
-$session = array();
+$_SESSION = array();
 session_destroy();
 deleteToken($db);
 

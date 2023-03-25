@@ -1,6 +1,6 @@
 <body>
     <a href="./cart.php">カートを見る（<?php print countTotalProduct($db); ?>点）</a>
-    <?php if ($_POST['submit'] == '検索' || $product = null): ?>
+    <?php if (isset($_POST['search']) || $product = null): ?>
         <a href="./product.php">商品一覧へ</a>
         <h2>検索結果</h2>
         <?php if (! empty($msg)) print '<p class="msg">' . $msg . '</p>'; ?>
@@ -11,3 +11,5 @@
         <?php if (! empty($msg)) print '<p class="msg">' . $msg . '</p>'; ?>
         <?php showPublicProduct($products); ?>
     <?php endif; ?>
+    <script src="../../0006/js/search.js"></script>
+	<script src="../../0006/js/product.js"></script>    

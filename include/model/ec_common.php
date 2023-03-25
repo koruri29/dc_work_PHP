@@ -39,6 +39,7 @@ function setSession(array $user): void {
 /**
  * $_SESSIONにログイン情報が保存されているかチェック
  * 
+ * @param object $pdo
  * @return bool
  */
 function isLogin(object $pdo): bool {
@@ -48,6 +49,9 @@ function isLogin(object $pdo): bool {
             exit();
         }
         return true;
+    } else {
+        $_SESSION = array();
+        session_destroy();
     }
 
     $user_name = checkAuthToken($pdo);
@@ -93,7 +97,12 @@ function setAutologin(object $pdo): int {
 }
 
 
-function isSessionInEffect() {
+/**
+ * セッションが有効かどうか判断
+ * 
+ * @return bool
+ */
+function isSessionInEffect(): bool {
     if ($_SESSION['user_name']) {
         if ($_SESSION['expires'] > time()) {
             return true;
@@ -136,6 +145,12 @@ function checkAuthToken(object $pdo) {
 /*-------------------------
  * SEARCH
  *-------------------------*/
+/**
+ * 検索機能をまとめた関数
+ * 
+ * @param object $pdo
+ * @return object $stmt 検索結果
+ */
 function searchProduct(object $pdo): object {
     //文字列を整える
     if (empty($_POST['search'])) {

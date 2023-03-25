@@ -44,3 +44,4 @@
         <input id="update-product" name="send" type="submit" value="設定を変更する">
     </form>
 	<script src="../../0006/js/edit.js"></script>
+	<script src="../../0006/js/search.js"></script>

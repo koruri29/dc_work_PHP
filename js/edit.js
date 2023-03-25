@@ -1,5 +1,3 @@
-// const registerForm = document.getElementById('register');
-// const updateForm = document.getElementById('update');
 const productName = document.getElementById('product-name');
 const price = document.getElementById('price');
 const qty = document.getElementById('qty');
@@ -76,6 +74,7 @@ function validateUpdatedProduct(error) {
 
 registerBtn.addEventListener('click', e => {
 	e.preventDefault();
+	registerBtn.disabled = true;
 	while (divRegister.firstChild) {
 		divRegister.removeChild(divRegister.firstChild);
 	}
@@ -83,6 +82,7 @@ registerBtn.addEventListener('click', e => {
 	error = validateProduct(error);
 	if (! error.length == 0) {
 		showError(error, divRegister);
+		registerBtn.disabled = false;
 	} else {
 		document.register.submit();
 	}
@@ -91,6 +91,7 @@ registerBtn.addEventListener('click', e => {
 
 updateBtn.addEventListener('click', e => {
 	e.preventDefault();
+	updateBtn.disabled = true;
 	while (divUpdate.firstChild) {
 		divUpdate.removeChild(divUpdate.firstChild);
 	}
@@ -98,6 +99,7 @@ updateBtn.addEventListener('click', e => {
 	error = validateUpdatedProduct(error);
 	if (! error.length == 0) {
 		showError(error, divUpdate);
+		updateBtn.disabled = false;
 	} else {
 		document.update.submit();
 	}

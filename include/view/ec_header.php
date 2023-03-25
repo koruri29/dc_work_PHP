@@ -10,7 +10,7 @@
                     <input type="search" name="search" placeholder="商品名">
                     <input type="radio" name="and-or" value="and" checked>and検索
                     <input type="radio" name="and-or" value="or">or検索
-                    <input id="click-once" type="submit" name="submit" value="検索">
+                    <input id="search" type="submit" name="search" value="検索">
                 </form>
             </li>
             <li class="nav-item">

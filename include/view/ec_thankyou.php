@@ -8,3 +8,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 <p>合計金額：<?php print $total; ?>円</p>
+<script src="../../0006/js/search.js"></script>

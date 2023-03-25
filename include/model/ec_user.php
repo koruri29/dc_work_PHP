@@ -7,9 +7,10 @@
  * 登録画面で入力のユーザー情報をチェックする。
  * 問題がなければデータベースに登録する。
  * 
+ * @param object $pdo
  * @return void 
  */
-function checkUserThenResister($pdo): void {
+function checkUserThenResister(object $pdo): void {
     global $error;
     global $msg;
     
