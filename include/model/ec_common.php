@@ -43,10 +43,8 @@ function setSession(array $user): void {
  * @return bool
  */
 function isLogin(object $pdo): bool {
-print 'isloginDONE';
-
     if (isSessionInEffect()) {
-        if ($_SESSION['user_name'] == 'ec_admin' && ! $_SERVER['REQUEST_URI'] == 'edit.php') {
+        if ($_SESSION['user_name'] == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
             header('Location: edit.php');
             exit();
         }
@@ -63,6 +61,12 @@ print 'isloginDONE';
         $token = setAuthToken($pdo, $user_name);
         setcookie('token', '', -3600);
         setcookie('token', $token, $_SESSION['expires']);
+
+        if($user_name == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
+            header('Location: edit.php');
+            exit();
+        }
+
         createCart($pdo);
         $_SESSION['cart_id'] = lastInsertId($pdo);
         setCartIdToAutologin($pdo);
@@ -86,19 +90,14 @@ function setAutologin(object $pdo): void {
 
     if ($_POST['auto-login'] == 'on') {
         $token = setAuthToken($pdo, $_POST['user-name']);
-        print $token;
         setcookie('token', '', time() - 3600);
         setcookie('token', $token, time() + $timeout);
-        print 'setcookie1';
-        var_dump($_COOKIE['token']);
         return;
     }
     if ($user_name = checkAuthToken($pdo)) {
-        print 'checkAuthTokenDONE';
         $token = setAuthToken($pdo, $user_name);
         setcookie('token', '', time() - 3600);
         setcookie('token', $token, time() + $timeout);
-        print 'setcookie2';
         return;
     }
     return;

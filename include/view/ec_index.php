@@ -9,7 +9,6 @@
                 <dt>パスワード</dt>
                 <dd><input type="password" name="password"></dd>
                 <input type="checkbox" name="auto-login">自動ログインをオンにする<br>
-                <!-- <input name="login" type="submit" value="ログイン"> -->
-                <button name="login" type="submit" value="login">ログイン</button>
+                <button name="login" type="submit" value="login">   ログイン</button>
             </dl>
         </form>

@@ -20,8 +20,7 @@ session_regenerate_id(true);
 
 setAutologin($db);//自動ログインがonならクッキーとトークンをセット
 
-
-//ログイン認証
+// ログイン認証
 if (! isLogin($db) || $_SESSION['user_name'] != 'ec_admin') {
     header('Location: index.php');
     exit();
