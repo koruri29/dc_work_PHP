@@ -91,10 +91,11 @@ function authUser(object $pdo): void {
         header('Location: edit.php');
         exit();
     } else {
-        createCart($pdo);//ログイン時にカートを作成
-        $_SESSION['cart_id'] = lastInsertId($pdo);
-        setCartIdToAutologin($pdo);
-        header('Location: product.php');
+        // createCart($pdo);//ログイン時にカートを作成
+        // $_SESSION['cart_id'] = lastInsertId($pdo);
+        // print 'カートつくったよ。autologinにセットするよ。';
+        // setCartIdToAutologin($pdo);
+        header('Location: product.php', true, 307);
         exit();   
     }
 }

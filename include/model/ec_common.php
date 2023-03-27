@@ -43,6 +43,8 @@ function setSession(array $user): void {
  * @return bool
  */
 function isLogin(object $pdo): bool {
+print 'isloginDONE';
+
     if (isSessionInEffect()) {
         if ($_SESSION['user_name'] == 'ec_admin' && ! $_SERVER['REQUEST_URI'] == 'edit.php') {
             header('Location: edit.php');
@@ -59,6 +61,7 @@ function isLogin(object $pdo): bool {
         $user = fetchUser($pdo, $user_name);
         setSession($user);
         $token = setAuthToken($pdo, $user_name);
+        setcookie('token', '', -3600);
         setcookie('token', $token, $_SESSION['expires']);
         createCart($pdo);
         $_SESSION['cart_id'] = lastInsertId($pdo);
@@ -76,24 +79,29 @@ function isLogin(object $pdo): bool {
  * @param object $pdo
  * @return int $timeout クッキー（セッション）の有効期限
  */
-function setAutologin(object $pdo): int {
+function setAutologin(object $pdo): void {
     global $timeout;
 
-    if (isSessionInEffect()) return $timeout;
+    if (isSessionInEffect()) return;
 
     if ($_POST['auto-login'] == 'on') {
-        $timeout = setTimeout($pdo);
         $token = setAuthToken($pdo, $_POST['user-name']);
+        print $token;
+        setcookie('token', '', time() - 3600);
         setcookie('token', $token, time() + $timeout);
-        return $timeout;
+        print 'setcookie1';
+        var_dump($_COOKIE['token']);
+        return;
     }
     if ($user_name = checkAuthToken($pdo)) {
-        $timeout = setTimeout($pdo);
+        print 'checkAuthTokenDONE';
         $token = setAuthToken($pdo, $user_name);
+        setcookie('token', '', time() - 3600);
         setcookie('token', $token, time() + $timeout);
-        return $timeout;
+        print 'setcookie2';
+        return;
     }
-    return $timeout;
+    return;
 }
 
 

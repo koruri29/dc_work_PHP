@@ -11,6 +11,9 @@ $db = getDb();
 
 //クッキー（セッション）の期限
 $timeout = 30 * 60;
+if ($_POST['auto-login'] == 'on' || $user_name = checkAuthToken($db)) {
+    $timeout = setTimeout($db);
+}
 
 session_start();
 session_regenerate_id(true);
@@ -23,12 +26,22 @@ if (! isLogin($db)) {
     exit();
 }
 
+if ($_POST['login'] == 'ログイン') {
+    createCart($db);//ログイン時にカートを作成
+    $_SESSION['cart_id'] = lastInsertId($db);
+    setCartIdToAutologin($db);
+}
+
 $products = fetchPublicProduct($db);
 $error = '';
 $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if ($_POST['cart-in'] == 'on'){
+    if ($_POST['login'] == 'login') {//ログイン直後、商品一覧ページへリダイレクトされたとき
+        createCart($db);//ログイン時にカートを作成
+        $_SESSION['cart_id'] = lastInsertId($db);
+        setCartIdToAutologin($db);
+    } else if ($_POST['cart-in'] == 'on'){
         addToCart($db);
     } else {//検索
         $products = searchProduct($db);

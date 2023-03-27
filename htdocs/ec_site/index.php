@@ -11,6 +11,9 @@ $db = getDb();
 
 //セッション（クッキー）の期限
 $timeout = 30 * 60;
+if ($_POST['auto-login'] == 'on' || $user_name = checkAuthToken($db)) {
+    $timeout = setTimeout($db);
+}
 
 session_start();
 session_regenerate_id(true);

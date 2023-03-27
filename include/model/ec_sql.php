@@ -908,11 +908,11 @@ function setAuthToken(object $pdo, string $user_name): string {
             EC_autologin (
                 token,
                 user_name,
-                expires,
+                expires
             ) VALUES (
                 :token,
                 :user_name,
-                :expires,
+                :expires
             )
     SQL;
 
@@ -952,6 +952,10 @@ function setCartIdToAutologin(object $pdo): void {
         $stmt->execute();
 
         $pdo->commit();
+        print 'できたかな？'  . $_SESSION['cart_id']  . '&' .  $_COOKIE['token'];
+        if ($stmt->rowCount() > 0) {
+            print 'できたよー';
+        }
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
