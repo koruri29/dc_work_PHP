@@ -30,11 +30,12 @@ $products = fetchPublicProduct($db);
 $error = '';
 $msg = '';
 
+var_dump($_SESSION);
+
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($_POST['login'] == 'login') {//ログイン直後、商品一覧ページへリダイレクトされたとき
-        createCart($db);//ログイン時にカートを作成
-        $_SESSION['cart_id'] = lastInsertId($db);
-        setCartIdToAutologin($db);
+
     } else if ($_POST['cart-in'] == 'on'){
         addToCart($db);
     } else {//検索

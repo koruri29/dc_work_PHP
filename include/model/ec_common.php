@@ -70,10 +70,11 @@ function isLogin(object $pdo): bool {
         $stmt = fetchAutoLogin($pdo);
         $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
         $_SESSION['cart_id'] = $autologin_info['cart_id'];
-        var_dump($_SESSION);
         // createCart($pdo);
         // $_SESSION['cart_id'] = lastInsertId($pdo);
         setCartIdToAutologin($pdo);
+        var_dump($_SESSION);
+        print 'isLogin分岐終了';
         return true;
     } else {
         return false;
