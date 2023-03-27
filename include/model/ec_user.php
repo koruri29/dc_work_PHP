@@ -85,16 +85,14 @@ function authUser(object $pdo): void {
         return;
     }
 
-    setSession($user);
+    // setSession($user);
 
     if ($user['user_name'] == 'ec_admin') {
         header('Location: edit.php');
         exit();
     } else {
-        createCart($pdo);//ログイン時にカートを作成
-        $_SESSION['cart_id'] = lastInsertId($pdo);
-        setCartIdToAutologin($pdo);
-        header('Location: product.php');
+
+        header('Location: index.php');
         exit();   
     }
 }

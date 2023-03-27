@@ -18,7 +18,7 @@ if ($_POST['auto-login'] == 'on' || $user_name = checkAuthToken($db)) {
 session_start();
 session_regenerate_id(true);
 
-setAutologin($db);//自動ログインがonならクッキーとトークンをセット
+if (! isSessionInEffect()) setAutologin($db);//クッキーとトークンをセット
 
 // ログイン認証
 if (! isLogin($db) || $_SESSION['user_name'] != 'ec_admin') {

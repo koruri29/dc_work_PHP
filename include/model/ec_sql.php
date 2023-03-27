@@ -99,6 +99,7 @@ function fetchUser(object $pdo, string $user_name) {
  * @return void
  */
 function createCart(object $pdo): void {
+    print 'started creating';
     $sql = <<<SQL
         INSERT INTO
             EC_cart (
@@ -123,6 +124,7 @@ function createCart(object $pdo): void {
         $stmt->execute();
         
         $pdo->commit();
+        print 'finished creating';
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
