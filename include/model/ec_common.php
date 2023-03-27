@@ -58,17 +58,21 @@ function isLogin(object $pdo): bool {
     if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
         $user = fetchUser($pdo, $user_name);
         setSession($user);
-        $token = setAuthToken($pdo, $user_name);
-        setcookie('token', '', -3600);
-        setcookie('token', $token, $_SESSION['expires']);
+        // $token = setAuthToken($pdo, $user_name);
+        // setcookie('token', '', -3600);
+        // setcookie('token', $token, $_SESSION['expires']);
 
         if($user_name == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
             header('Location: edit.php');
             exit();
         }
 
-        createCart($pdo);
-        $_SESSION['cart_id'] = lastInsertId($pdo);
+        $stmt = fetchAutoLogin($pdo);
+        $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
+        $_SESSION['cart_id'] = $autologin_info['cart_id'];
+        var_dump($_SESSION);
+        // createCart($pdo);
+        // $_SESSION['cart_id'] = lastInsertId($pdo);
         setCartIdToAutologin($pdo);
         return true;
     } else {

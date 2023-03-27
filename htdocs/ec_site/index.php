@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 if (isLogin($db)) {
-    header('Location: product.php');
-    exit();
+    // header('Location: product.php');
+    // exit();
 }
 
 

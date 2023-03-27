@@ -26,12 +26,6 @@ if (! isLogin($db)) {
     exit();
 }
 
-if ($_POST['login'] == 'ログイン') {
-    createCart($db);//ログイン時にカートを作成
-    $_SESSION['cart_id'] = lastInsertId($db);
-    setCartIdToAutologin($db);
-}
-
 $products = fetchPublicProduct($db);
 $error = '';
 $msg = '';
