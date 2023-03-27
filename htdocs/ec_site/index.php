@@ -18,44 +18,22 @@ if ($_POST['auto-login'] == 'on' || $user_name = checkAuthToken($db)) {
 session_start();
 session_regenerate_id(true);
 
-if (! isSessionInEffect()) setAutologin($db);//クッキーとトークンをセット
-
 
 $error = array();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    authUser($db);
+if (! isSessionInEffect()) {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        authUser($db);
+    }
 }
 
 
-// if (isEqualCartAndCookie($db)) {
-//     //
-// } else {
-//     if (isset($_COOKIE['token'])) {
-//         $stmt = fetchAutoLogin($db);
-//         $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
-//         if (! empty($autologin_info['cart_id'])) {
-//             var_dump($autologin_info['cart_id']);
-//             $_SESSION['cart_id'] = $autologin_info['cart_id'];
-//             print '自動ログインでセットしたよ： cart_id' . $_SESSION['cart_id'];
-//         } else {
-//             createCart($db);
-//             $_SESSION['cart_id'] = lastInsertId($db);
-//             setCartIdToAutologin($db);
-//             print '自動ログインだけど新しくセットしたよ： cart_id' . $_SESSION['cart_id'];
-//         }
-//     } else {
-//         createCart($db);
-//         $_SESSION['cart_id'] = lastInsertId($db);
-//         setCartIdToAutologin($db);
-//         print 'セットしたよ： cart_id' . $_SESSION['cart_id'];
-//     }
-// }
+setAutologin($db);//クッキーとトークンをセット
 
 
 if (isLogin($db)) {
-    // header('Location: product.php');
-    // exit();
+    header('Location: product.php');
+    exit();
 }
 
 

@@ -717,7 +717,7 @@ function insertSales(object $pdo, array $product): void {
         $pdo->commit();
 
         if ($stmt->rowCount() > 0) {
-            $msg = array_merge($msg, ['thankyou' => '購入が完了しました。ありがとうございました。']);
+            $msg = '購入が完了しました。ありがとうございました。';
         }
     } catch (PDOException $e) {
         $pdo->rollback();

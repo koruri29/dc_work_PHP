@@ -94,18 +94,7 @@ function isLogin(object $pdo): bool {
  */
 function setAutologin(object $pdo): void {
     global $timeout;
-    if ($_POST['auto-login'] == 'on') {
-        $user = fetchUser($pdo, $_POST['user-name']);
-        setSession($user);
 
-        $token = setAuthToken($pdo, $_POST['user-name']);
-        setcookie('token', '', time() - 3600);
-        setcookie('token', $token, time() + $timeout);
-        print 'setAutologinのpostぶんき！';
-        var_dump($token);
-        var_dump($_COOKIE['token']);
-        return;
-    }
 
     if ($user_name = checkAuthToken($pdo)) {
         $user = fetchUser($pdo, $user_name);

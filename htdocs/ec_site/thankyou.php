@@ -28,7 +28,7 @@ if (! isLogin($db)) {
 }
 
 
-$msg = array();
+$msg = '';
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

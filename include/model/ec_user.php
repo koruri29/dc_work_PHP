@@ -69,29 +69,42 @@ function validatePassword(): void {
  * adminユーザー(ID: ec_admin)の場合は商品管理ページ（product.php）へ飛ぶ。
  * 
  * @param object $pdo
- * @return void 
+ * @return bool
  */
-function authUser(object $pdo): void {
+function authUser(object $pdo): bool {
     global $error;
 
     $user = fetchUser($pdo, $_POST['user-name']);
 
     if ($user == false) {
         $error = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
-        return;
+        return false;
     }
     if (! password_verify($_POST['password'], $user['password'])) {
         $error = array_merge($error, ['login' => 'ユーザー名かパスワードが間違っています。']);
-        return;
+        return false;
     }
 
-    // setSession($user);
+
+    if ($_POST['auto-login'] == 'on') {
+        global $timeout;
+        $user = fetchUser($pdo, $_POST['user-name']);
+        setSession($user);
+
+        $token = setAuthToken($pdo, $_POST['user-name']);
+        setcookie('token', '', time() - 3600);
+        setcookie('token', $token, time() + $timeout);
+        print 'setAutologinのpostぶんき！';
+        var_dump($token);
+        var_dump($_COOKIE['token']);
+    } else {
+        setSession($user);
+    }
 
     if ($user['user_name'] == 'ec_admin') {
         header('Location: edit.php');
         exit();
     } else {
-
         header('Location: index.php');
         exit();   
     }

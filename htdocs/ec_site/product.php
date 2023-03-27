@@ -26,12 +26,10 @@ if (! isLogin($db)) {
     header('Location: index.php');
     exit();
 }
-var_dump($_COOKIE['token']);
+// var_dump($_COOKIE['token']);
 
-if (isEqualCartAndCookie($db)) {
-    //
-} else {
-    if (isset($_COOKIE['token'])) {
+if (parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH) == '/omiya/0006/ec_site/index.php') {
+    if (checkAuthToken($db)) {
         $stmt = fetchAutoLogin($db);
         $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
         if (! empty($autologin_info['cart_id'])) {
