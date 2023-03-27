@@ -34,6 +34,7 @@ function setSession(array $user): void {
     $_SESSION['user_name'] = $user['user_name'];
     $_SESSION['timeout'] = $timeout;
     $_SESSION['expires'] = time() + $timeout;
+    $_SESSION['cart_id'] = '';
 }
 
 /**
@@ -54,12 +55,11 @@ function isLogin(object $pdo): bool {
         session_destroy();
     }
 
-    $user_name = checkAuthToken($pdo);
-    if ($user_name !== false) {//自動ログインが有効で、ユーザーIDが返って来た場合
+    if ($user_name = checkAuthToken($pdo)) {//自動ログインが有効で、ユーザーIDが返って来た場合
         $user = fetchUser($pdo, $user_name);
         setSession($user);
         $token = setAuthToken($pdo, $user_name);
-        setcookie('token', '', -3600);
+        setcookie('token', '', time() - 3600);
         setcookie('token', $token, $_SESSION['expires']);
 
         if($user_name == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
@@ -67,9 +67,16 @@ function isLogin(object $pdo): bool {
             exit();
         }
 
-        createCart($pdo);
-        $_SESSION['cart_id'] = lastInsertId($pdo);
-        setCartIdToAutologin($pdo);
+        // $stmt = fetchAutoLogin($pdo);
+        // $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
+        // $_SESSION['cart_id'] = $autologin_info['cart_id'];
+        // print $autologin_info['cart_id'];
+        // var_dump($_SESSION);
+        // var_dump($token);
+        // var_dump($_COOKIE['token']);
+        // createCart($pdo);
+        // $_SESSION['cart_id'] = lastInsertId($pdo);
+        // setCartIdToAutologin($pdo);
         return true;
     } else {
         return false;
@@ -85,22 +92,50 @@ function isLogin(object $pdo): bool {
  */
 function setAutologin(object $pdo): void {
     global $timeout;
-
-    if (isSessionInEffect()) return;
-
     if ($_POST['auto-login'] == 'on') {
+        $user = fetchUser($pdo, $_POST['user-name']);
+        setSession($user);
+
         $token = setAuthToken($pdo, $_POST['user-name']);
         setcookie('token', '', time() - 3600);
         setcookie('token', $token, time() + $timeout);
+        print 'setAutologinのpostぶんき！';
+        var_dump($token);
+        var_dump($_COOKIE['token']);
         return;
     }
+
     if ($user_name = checkAuthToken($pdo)) {
-        $token = setAuthToken($pdo, $user_name);
+        $user = fetchUser($pdo, $user_name);
+        setSession($user);
+
+        $stmt = fetchAutoLogin($pdo);
+        $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
+        $_SESSION['cart_id'] = $autologin_info['cart_id'];
+
+        $token = $_COOKIE['token'];
         setcookie('token', '', time() - 3600);
         setcookie('token', $token, time() + $timeout);
+
+        print 'setAutologinのtokenぶんき！';
+        var_dump($token);
+        var_dump($_COOKIE['token']);
         return;
     }
     return;
+}
+
+
+/**
+ * 
+ */
+function isEqualCartAndCookie(object $pdo) {
+    $stmt  = fetchAutoLogin($pdo);
+    $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($_SESSION['cart_id'] !== $autologin_info['cart_id']) {
+        return false;
+    }
+    return true;
 }
 
 

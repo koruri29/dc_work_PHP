@@ -85,13 +85,13 @@ function authUser(object $pdo): void {
         return;
     }
 
-    setSession($user);
+    // setSession($user);
 
     if ($user['user_name'] == 'ec_admin') {
         header('Location: edit.php');
         exit();
     } else {
-        header('Location: product.php', true, 307);
+        header('Location: index.php');
         exit();   
     }
 }
