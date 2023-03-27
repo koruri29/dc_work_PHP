@@ -682,6 +682,7 @@ function unlockTable(object $pdo): void {
  * @return void
  */
 function insertSales(object $pdo, array $product): void {
+    global $msg;
     $sql = <<<SQL
         INSERT INTO
             EC_sales (
@@ -712,6 +713,10 @@ function insertSales(object $pdo, array $product): void {
         $stmt->execute();
 
         $pdo->commit();
+
+        if ($stmt->rowCount() > 0) {
+            $msg = array_merge($msg, ['thankyou' => '購入が完了しました。ありがとうございました。']);
+        }
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
