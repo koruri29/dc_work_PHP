@@ -83,8 +83,8 @@ function registerProduct(object $pdo): void {
     global $msg_register;
     global $error_register;
 
-    // validateProduct();
-    // validateImage();
+    validateProduct();
+    validateImage();
 
     if (empty($error_register)) {
         if (
@@ -269,7 +269,7 @@ function showProductInCart(object $pdo): void {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>数量：</th><td><input class="qty" type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
+        print '<tr><th>数量：</th><td><input class="qty" class="qty" type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['qty'] . '円</td></tr>';
         print '<tr><th>削除</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
         print '</table>';

@@ -1,7 +1,7 @@
 <body>
 	<a href="./index.php">ログインはこちら</a>
 	<h2 class="h2">ユーザー登録</h2>
-	<div class="show-msg">
+	<div id="show-msg">
 		<?php if (! empty($msg)) print '<p class="msg">' . $msg . '</p>'; ?>
 		<?php if (! empty($error)) {
 			foreach ($error as $error_msg) {

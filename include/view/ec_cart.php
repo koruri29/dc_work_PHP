@@ -1,13 +1,15 @@
 <a href="./product.php">商品一覧へ</a>
 <br>
 <h2>カート内商品</h2>
-<?php
-    if (! empty($error)) {
-        foreach ($error as $error_msg) {
-            print '<p class="error">' . $error_msg . '</p>';
+<div id="show-error">
+    <?php
+        if (! empty($error)) {
+            foreach ($error as $error_msg) {
+                print '<p class="error">' . $error_msg . '</p>';
+            }
         }
-    }
-?>
+    ?>
+</div>
 <form name="form1" action="./cart.php" method="post">
     <?php showProductInCart($db); ?>
     <input type="hidden" name="product-num" value="<?php print $product_num; ?>">

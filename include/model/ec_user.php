@@ -37,9 +37,7 @@ function checkUserThenResister(object $pdo): void {
  */
 function validateUserName(): void {
     global $error;
-    if (preg_match('/^[a-zA-Z0-9]{5,}$/', $_POST['user-name'])) {
-        //
-    } else {
+    if (! preg_match('/^[a-zA-Z0-9]{5,}$/', $_POST['user-name'])) {
         $error = array_merge($error, ['user_name' => 'ユーザー名は半角英数字5文字以上で入力してください。']);
     }
 }
@@ -51,9 +49,7 @@ function validateUserName(): void {
  */
 function validatePassword(): void {
     global $error;
-    if (preg_match('/^[a-zA-Z0-9]{8,}$/', $_POST['password'])) {
-        //
-    } else {
+    if (! preg_match('/^[a-zA-Z0-9]{8,}$/', $_POST['password'])) {
         $error = array_merge($error, ['password' => 'パスワードは半角英数字8文字以上で入力してください。']);
     }
 }

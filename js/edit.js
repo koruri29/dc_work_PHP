@@ -30,9 +30,7 @@ function validateProduct(error) {
 	if (qty.value < 0) {
 		error.push('在庫数は正の整数を入力してください。');
 	}
-	// if (publicFlag.value === '') {
-	// 	error.push('公開ステータスを選択してください');
-	// }
+	
 	return error;
 }
 

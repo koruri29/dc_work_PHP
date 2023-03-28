@@ -67,18 +67,6 @@ function isLogin(object $pdo): bool {
             header('Location: edit.php');
             exit();
         }
-
-
-        // $stmt = fetchAutoLogin($pdo);
-        // $autologin_info = $stmt->fetch(PDO::FETCH_ASSOC);
-        // $_SESSION['cart_id'] = $autologin_info['cart_id'];
-        // print $autologin_info['cart_id'];
-        // var_dump($_SESSION);
-        // var_dump($token);
-        // var_dump($_COOKIE['token']);
-        // createCart($pdo);
-        // $_SESSION['cart_id'] = lastInsertId($pdo);
-        // setCartIdToAutologin($pdo);
         return true;
     } else {
         return false;
@@ -95,7 +83,6 @@ function isLogin(object $pdo): bool {
 function setAutologin(object $pdo): void {
     global $timeout;
 
-
     if ($user_name = checkAuthToken($pdo)) {
         $user = fetchUser($pdo, $user_name);
         setSession($user);
@@ -108,9 +95,6 @@ function setAutologin(object $pdo): void {
         setcookie('token', '', time() - 3600);
         setcookie('token', $token, time() + $timeout);
 
-        print 'setAutologinのtokenぶんき！';
-        var_dump($token);
-        var_dump($_COOKIE['token']);
         return;
     }
     return;

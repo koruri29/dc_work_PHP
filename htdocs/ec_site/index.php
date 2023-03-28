@@ -15,12 +15,13 @@ if ($_POST['auto-login'] == 'on' || $user_name = checkAuthToken($db)) {
     $timeout = setTimeout($db);
 }
 
+
 session_start();
 session_regenerate_id(true);
 
 
 $error = array();
-
+//ログインセッションが切れていれば、ユーザー認証を行う
 if (! isSessionInEffect()) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         authUser($db);
@@ -28,7 +29,7 @@ if (! isSessionInEffect()) {
 }
 
 
-setAutologin($db);//クッキーとトークンをセット
+setAutologin($db);//自動ログインの場合、クッキーとトークンをセット
 
 
 if (isLogin($db)) {
