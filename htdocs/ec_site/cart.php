@@ -25,6 +25,16 @@ if (! isSessionInEffect()) setAutologin($db);//クッキーとトークンをセ
 if (! isLogin($db)) {
     header('Location: index.php');
     exit();
+} else {
+    if ($_SESSION['user_name'] == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
+        header('Location: edit.php');
+        exit();
+    }
+    $user_name = checkAuthToken($db);
+    if ($user_name == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
+        header('Location: edit.php');
+        exit();
+    }
 }
 
 

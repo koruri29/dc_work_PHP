@@ -22,6 +22,15 @@ setAutologin($db);//自動ログインがonならクッキーとトークンを�
 
 
 if (isLogin($db)) {
+    if ($_SESSION['user_name'] == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
+        header('Location: edit.php');
+        exit();
+    }
+    $user_name = checkAuthToken($db);
+    if ($user_name == 'ec_admin' && $_SERVER['REQUEST_URI'] != '/omiya/0006/ec_site/edit.php') {
+        header('Location: edit.php');
+        exit();
+    }
     header('Location: product.php');
     exit();
 }

@@ -22,9 +22,13 @@ if (! isSessionInEffect()) setAutologin($db);//クッキーとトークンをセ
 
 
 // ログイン認証
-if (! isLogin($db) || $_SESSION['user_name'] != 'ec_admin') {
+if (! isLogin($db)) {
     header('Location: index.php');
     exit();
+}
+if ($_SESSION['user_name'] != 'ec_admin') {
+    header('Location: product.php');
+    exit(); 
 }
 
 
