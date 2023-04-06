@@ -424,7 +424,7 @@ function validateQty(): bool {
         if (! is_numeric($_POST['qty' . $i])) {
             $error = array_merge($error, ['qty_not_num' => '数量は半角数字で入力してください。']);
         }
-        if ($_POST['qty' . $i] < 0) {
+        if ($_POST['qty' . $i] < 1) {
             $error = array_merge($error, ['qty_minus' => '数量は正の整数で入力してください。']);
         }
     }

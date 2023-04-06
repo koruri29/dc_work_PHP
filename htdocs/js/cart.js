@@ -14,7 +14,7 @@ function validateQty(error) {
 		if (isNaN(qtyInput[i].value)) {
 			numFlag = false;
 		}
-		if (qtyInput[i].value < 0) {
+		if (qtyInput[i].value < 1) {
 			plusFlag = false;
 		}
 	}
