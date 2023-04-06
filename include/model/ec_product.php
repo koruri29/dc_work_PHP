@@ -122,7 +122,7 @@ function validateImage(): void {
     }
     $pathinfo = pathinfo($_FILES['image']['name']);
     $ext = strtolower($pathinfo['extension']);
-    if ($ext != 'jpg' && $ext != 'png') {
+    if ($ext != 'jpg' && $ext != 'jpeg' && $ext != 'png') {
         $error_register = array_merge($error_register, ['ext' => 'jpgまたはpngファイル以外が選択されています。']);
         return;
     }
