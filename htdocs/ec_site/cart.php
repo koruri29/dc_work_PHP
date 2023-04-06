@@ -75,19 +75,7 @@ if ($stmt->fetch(PDO::FETCH_ASSOC)) {
 }
 
 //購入ボタンを表示するか
-$stmt = fetchAllInCart($db);
-$show_purchase_btn = false;
-while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $show_purchase_btn = true;
-    if ($product['qty'] == 0) {
-        $show_purchase_btn = false;
-    }
-}
-for ($i =0; $i < $product_num; $i++) {
-    if (isset($error['stock' . $i])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
-        $show_purchase_btn = false;
-    }
-}
+$show_purchase_btn = doesShowPurchaseButton($db);
 
 
 include_once ('../../include/view/ec_head.html');

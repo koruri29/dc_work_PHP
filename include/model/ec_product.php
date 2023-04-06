@@ -284,6 +284,22 @@ function showProductInCart(object $pdo): void {
 }
 
 
+function doesShowPurchaseButton(object $pdo): bool {
+    $stmt = fetchAllInCart($pdo);
+    while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        if ($product['qty'] == 0) {
+            return false;
+        }
+    }
+    for ($i =0; $i < $product_num; $i++) {
+        if (isset($error['stock' . $i])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
+            return false;
+        }
+    }
+    return true;
+}
+
+
 /**
  * カート内の商品の数量変更の関数
  * 
