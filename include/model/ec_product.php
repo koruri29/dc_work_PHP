@@ -285,6 +285,7 @@ function showProductInCart(object $pdo): void {
 
 
 function doesShowPurchaseButton(object $pdo): bool {
+    global $product_num;
     $stmt = fetchAllInCart($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         if ($product['qty'] == 0) {
