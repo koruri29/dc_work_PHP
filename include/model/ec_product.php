@@ -297,7 +297,7 @@ function changeQtyInCart(object $pdo): void {
         if (($_POST['delete' . $i])) {
             deleteProductInCart($pdo, $_POST['product-id' . $i]);
         }
-        if ($_POST['qty' . $i] === $current_qty) {  
+        if ($_POST['qty' . $i] == $current_qty) {  
             //
         } else {
             $qty = getNewQty($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);

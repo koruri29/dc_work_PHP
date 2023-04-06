@@ -48,7 +48,7 @@ if (parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH) == '/omiya/0006/ec_site/in
 
 $products = fetchPublicProduct($db);
 $error = '';
-$msg = '';
+$msg = array();
 
 
 //post（カートに入れるor検索）が来た場合の処理

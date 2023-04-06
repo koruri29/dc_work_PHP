@@ -556,7 +556,7 @@ function newlyAddToCart(object $pdo): void {
         $stmt->execute();
 
         $pdo->commit();
-        $msg = 'カートに商品を追加しました。';
+        $msg = array_merge($msg, ['add_to_cart' => 'カートに商品を追加しました。']);
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();

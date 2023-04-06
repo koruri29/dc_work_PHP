@@ -9,7 +9,7 @@
             }
         }
     ?>
-        <?php
+    <?php
         if (! empty($msg)) {
             foreach ($msg as $message) {
                 print '<p class="msg">' . $message . '</p>';
