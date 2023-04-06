@@ -42,6 +42,8 @@ $error = array();
 $msg = array();
 $product_num = countProductInCart($db);//カート内商品の種類数。formで渡す用
 
+
+//削除または数量変更があった場合の処理
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     for ($i = 0; $i < $_POST['product-num']; $i++) {
         if ($_POST['delete' . $i] != '') {
@@ -74,16 +76,19 @@ if ($stmt->fetch(PDO::FETCH_ASSOC)) {
 
 //購入ボタンを表示するか
 $stmt = fetchAllInCart($db);
-$show_purchase_btn = true;
-if ($stmt->fetch(PDO::FETCH_ASSOC)) {
-    for ($i =0; $i < $product_num; $i++) {
-        if (isset($error['stock' . $i])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
-            $show_purchase_btn = false;
-        }
+$show_purchase_btn = false;
+while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $show_purchase_btn = true;
+    if ($product['qty'] == 0) {
+        $show_purchase_btn = false;
     }
-} else {
-    $show_purchase_btn = false;
 }
+for ($i =0; $i < $product_num; $i++) {
+    if (isset($error['stock' . $i])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
+        $show_purchase_btn = false;
+    }
+}
+
 
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_cart.html');
