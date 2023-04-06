@@ -21,13 +21,13 @@ session_regenerate_id(true);
 if (! isSessionInEffect()) setAutologin($db);//クッキーとトークンをセット
 
 
-
 if (! isLogin($db)) {
     header('Location: index.php');
     exit();
 }
 
 
+//index.phpから遷移の場合、自動ログインを判断して前回のカートにつなげるor新しくカートを作成
 if (parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH) == '/omiya/0006/ec_site/index.php') {
     if (checkAuthToken($db)) {
         $stmt = fetchAutoLogin($db);
@@ -51,7 +51,7 @@ $error = '';
 $msg = '';
 
 
-
+//post（カートに入れるor検索）が来た場合の処理
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($_POST['cart-in'] == 'on'){
         addToCart($db);

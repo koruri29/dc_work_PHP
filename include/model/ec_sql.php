@@ -332,9 +332,9 @@ function updateFlag(object $pdo, int $id): void {
 
         if ($stmt->rowCount() > 0) {            
             if ($flag === 0) {
-                $msg_update = array_merge($msg_update, ['display' => '公開に変更しました。']);
-            } else {
                 $msg_update = array_merge($msg_update, ['non-display' => '非公開に変更しました。']);
+            } else {
+                $msg_update = array_merge($msg_update, ['display' => '公開に変更しました。']);
             }
         }
     } catch (PDOException $e) {
@@ -490,6 +490,7 @@ function countProductInCart(object $pdo): int {
  * @return void
  */
 function deleteProductInCart(object $pdo, int $id): void {
+    global $msg;
     $sql = <<<SQL
         DELETE FROM
             EC_cart_detail
@@ -508,6 +509,7 @@ function deleteProductInCart(object $pdo, int $id): void {
         $stmt->execute();
 
         $pdo->commit();
+        $msg = array_merge($msg, ['deleted' => '商品を削除しました。']);
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();
@@ -596,7 +598,11 @@ function updateQty(object $pdo, int $id, int $qty): void {
         $stmt->execute();
 
         $pdo->commit();
-        $msg = 'カートに商品を追加しました。';
+        if ($_SERVER['REQUEST_URI'] == '/omiya/0006/ec_site/product.php') {
+            $msg = array_merge($msg, ['into_cart' => 'カートに商品を追加しました。']);
+        } else {
+            $msg = array_merge($msg, ['changed_qty' => '数量を変更しました。']);
+        }
     } catch (PDOException $e) {
         $pdo->rollback();
         echo $e->getMessage();

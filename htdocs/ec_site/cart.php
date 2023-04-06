@@ -29,7 +29,7 @@ if (! isLogin($db)) {
 
 
 $error = array();
-$msg = '';
+$msg = array();
 $product_num = countProductInCart($db);//カート内商品の種類数。formで渡す用
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
