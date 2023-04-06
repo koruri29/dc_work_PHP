@@ -50,10 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             deleteProductInCart($db, $_POST['product-id' . $i]);
         } else {//削除以外の場合はバリデーションチェック
             validateQty($_POST['qty' . $i]);
-            if (empty($error)) {
-                changeQtyInCart($db, $_POST['product-id' . $i]);
-            }
         }
+    }
+    if (empty($error)) {
+        changeQtyInCart($db, $_POST['product-id' . $i]);
     }
 }
 
