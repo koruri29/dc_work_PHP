@@ -135,6 +135,7 @@ function validateImage(): void {
  */
 function validateProduct(): void {
     global $error_register;
+    $pattern = '/^[0-9]*[\.][0-9]*/';
     
     if (empty($_POST['name'])) {
         $error_register = array_merge($error_register, ['name_empty' => '商品名が入力されていません。']);
@@ -145,7 +146,7 @@ function validateProduct(): void {
     if (! is_numeric($_POST['price'])) {
         $error_register = array_merge($error_register, ['price_not_num' => '価格は半角数字で入力してください。']);
     }
-    if ($_POST['price'] < 0) {
+    if ($_POST['price'] < 0 || preg_match($pattern, $_POST['price'])) {
         $error_register = array_merge($error_register, ['price_minus' => '価格は正の整数を入力してください。']);
     }
     if ($_POST['qty'] === '') {
@@ -154,7 +155,7 @@ function validateProduct(): void {
     if (! is_numeric($_POST['qty'])) {
         $error_register = array_merge($error_register, ['qty_not_num' => '在庫数は半角数字で入力してください。']);
     }
-    if ($_POST['qty'] < 0) {
+    if ($_POST['qty'] < 0 || preg_match($pattern, $_POST['qty'])) {
         $error_register = array_merge($error_register, ['qty_minus' => '在庫数は正の整数を入力してください。']);
     }
 }
@@ -271,7 +272,7 @@ function showProductInCart(object $pdo): void {
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
         print '<tr><th>数量：</th><td><input class="qty" class="qty" type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['qty'] . '円</td></tr>';
-        print '<tr><th>削除</th><td><input type="checkbox" name="delete' . $i . '"></td></tr>';
+        print '<tr><th>削除</th><td><input class="delete" type="checkbox" name="delete' . $i . '"></td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '" alt="' . $product['image_name'] . '">';
         print '<br>';
@@ -284,24 +285,35 @@ function showProductInCart(object $pdo): void {
 
 
 /**
- * カート内の商品の数量変更または削除の関数
+ * カート内の商品の数量変更の関数
  * 
  * @param object $pdo
  * @return void
  */
-function changeQtyInCart(object $pdo): void {
+function changeQtyInCart(object $pdo, int $id): void {
     for ($i = 0; $i < $_POST['product-num']; $i++) {
-        $rec = fetchOneInCart($pdo, $_POST['product-id' . $i]);
+        $rec = fetchOneInCart($pdo, $id);
         $current_qty = $rec['qty'];
-    
-        if (($_POST['delete' . $i])) {
-            deleteProductInCart($pdo, $_POST['product-id' . $i]);
-        }
+
         if ($_POST['qty' . $i] == $current_qty) {  
             //
         } else {
             $qty = getNewQty($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);
             updateQty($pdo, $_POST['product-id' . $i], $qty);
+        }
+    }
+}
+
+/**
+ * カート内の商品を削除する
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function deleteFromCart(object $pdo) {
+    for ($i = 0; $i < $_POST['product-num']; $i++) {
+        if (($_POST['delete' . $i])) {
+            deleteProductInCart($pdo, $_POST['product-id' . $i]);
         }
     }
 }
@@ -347,12 +359,14 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
  */
 function isStockAvailable(object $pdo): void {
     global $error;
+    $i = 0;
     $stmt = fetchAllInCart($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = fetchOneFromProduct($pdo, $product['product_id']);
-        if ($product['qty'] == 0 ) {
-            $error = array_merge($error, ['stock' => "カート内の{$product['product_name']}が売り切れています。"]);
-        } 
+        if ($product['qty'] == 0) {
+            $error = array_merge($error, ['stock' . $i => "カート内の{$product['product_name']}が売り切れています。"]);
+        }
+        $i++;
     }
 }
 
@@ -411,23 +425,23 @@ function doesExistInCart(object $pdo): bool {
 /** 
  * カート内商品の数量変更の際のバリデーション
  * 
+ * @param $qty 確認する値（正の整数を想定）
  * @return bool
 */
-function validateQty(): bool {
+function validateQty($qty): bool {
     global $error;
     global $product_num;
+    $pattern = '/^[0-9]*[\.][0-9]*/';
 
-    for ($i = 0; $i < $product_num; $i++) {
-        if ($_POST['qty' . $i] === '') {
+        if ($qty === '') {
             $error = array_merge($error, ['qty_empty' => '数量が入力されていません。']);
         }
-        if (! is_numeric($_POST['qty' . $i])) {
+        if (! is_numeric($qty)) {
             $error = array_merge($error, ['qty_not_num' => '数量は半角数字で入力してください。']);
         }
-        if ($_POST['qty' . $i] < 1) {
+        if ($qty < 1 || preg_match($pattern, $qty)) {
             $error = array_merge($error, ['qty_minus' => '数量は正の整数で入力してください。']);
         }
-    }
 
     if (count($error) === 0) {
         return true;

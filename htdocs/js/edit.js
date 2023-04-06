@@ -9,6 +9,8 @@ const divRegister = document.getElementById('register-error');
 const divUpdate = document.getElementById('update-error');
 
 function validateProduct(error) {
+	const pattern = /^[0-9]*[.][0-9]*/;
+
 	if (productName.value === '') {
 		error.push('商品名が入力されていません。');
 	}
@@ -18,7 +20,7 @@ function validateProduct(error) {
 	if (isNaN(price.value)) {
 		error.push('価格は半角数字で入力してください。');
 	}
-	if (price.value < 0) {
+	if (price.value < 0 || pattern.test(price.value)) {
 		error.push('価格は正の整数を入力してください。');
 	}
 	if (qty.value === '') {
@@ -27,7 +29,7 @@ function validateProduct(error) {
 	if (isNaN(qty.value)) {
 		error.push('在庫数は半角数字で入力してください。');
 	}
-	if (qty.value < 0) {
+	if (qty.value < 0 || pattern.test(qty.value)) {
 		error.push('在庫数は正の整数を入力してください。');
 	}
 	
