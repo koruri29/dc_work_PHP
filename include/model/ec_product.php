@@ -352,6 +352,9 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
         } else {
             $changed_qty = $posted_qty;
         }
+        if ($max_qty <= 0) {
+            $changed_qty = 0;
+        }
         return $changed_qty;
     }
 
