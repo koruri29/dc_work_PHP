@@ -855,13 +855,21 @@ function andSearch(object $pdo, array $words) {
         WHERE public_flag = 1 AND product_name LIKE 
     SQL;
     for ($i = 0; $i < count($words); $i++) {
-        $arr[] = '\'%' . $words[$i] . '%\'';
+        $arr[] = '?';
         $arr[] = ' AND product_name LIKE ';
     }
     $arr[count($words) * 2] = '';//最後のANDを削除
     $sql = implode('', $arr);
     if (empty($words)) $sql = 'SELECT * FROM EC_product WHERE 1 = 0;';
+
     $stmt = $pdo->prepare($sql);
+    if (! empty ($words)) {
+        $i = 1;
+        foreach ($words as $word) {
+            $stmt->bindValue($i, '%' . $word . '%');
+            $i++;
+        }
+    }
     $stmt->execute();
 
     return $stmt;
@@ -884,14 +892,22 @@ function orSearch(object $pdo, array $words) {
         WHERE public_flag = 1 AND product_name LIKE 
     SQL;
     for ($i = 0; $i < count($words); $i++) {
-        $arr[] = '\'%' . $words[$i] . '%\'';
+        $arr[] = '?';
         $arr[] = ' OR product_name LIKE ';
     }
     $arr[count($words) * 2] = '';//最後のORを削除
 
     $sql = implode('', $arr);
     if (empty($words)) $sql = 'SELECT * FROM EC_product WHERE 1 = 0;';
+
     $stmt = $pdo->prepare($sql);
+    if (! empty ($words)) {
+        $i = 1;
+        foreach ($words as $word) {
+            $stmt->bindValue($i, '%' . $word . '%');
+            $i++;
+        }
+    }
     $stmt->execute();
 
     return $stmt;
