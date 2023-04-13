@@ -39,7 +39,7 @@ qtyChangeBtn.addEventListener('click', e => {
 	if (error.length > 0) {
 		showError(error, div);
 	} else {
-		// document.form1.submit();
+		document.form1.submit();
 	}
 });
 
