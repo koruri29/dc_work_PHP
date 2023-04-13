@@ -376,7 +376,7 @@ function isStockAvailable(object $pdo): void {
     $stmt = fetchAllInCart($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = fetchOneFromProduct($pdo, $product['product_id']);
-        if ($product['qty'] == 0) {
+        if ($product['qty'] <= 0) {
             $error = array_merge($error, ['stock' . $i => "カート内の{$product['product_name']}が売り切れています。"]);
         }
         $i++;
