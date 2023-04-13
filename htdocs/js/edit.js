@@ -32,42 +32,32 @@ function validateProduct(error) {
 	if (qty.value < 0 || pattern.test(qty.value)) {
 		error.push('在庫数は正の整数を入力してください。');
 	}
-	
 	return error;
 }
 
 
 function validateUpdatedProduct(error) {
+	const pattern = /^[0-9]*[.][0-9]*/;
 	let issetQty = true;
 	let isQtyNum = true;
 	let isQtyPlus = true;
 
-	for (let i = 0; i < qty.length; i++) {
-		if (qty[i].value === '') {
+	for (let i = 0; i < qtys.length; i++) {
+		if (qtys[i].value === '') {
 			issetQty = false;
 		}
-	}
-	if (! issetQty) {
-		error.push('在庫数が入力されていません。');
-	}
-
-	for (let i = 0; i < qty.length; i++) {
-		if (isNaN(qty.value)) {
+		if (isNaN(qtys[i].value)) {
 			isQtyNum = false;
 		}
-	}
-	if (! isQtyNum) {
-		error.push('在庫数は半角数字で入力してください。');
-	}
-
-	for (let i = 0; i < qty.length; i++) {
-		if (qty.value < 0) {
+		if (qtys[i].value < 0 || pattern.test(qtys[i].value)) {
 			isQtyPlus = false;
 		}
 	}
-	if (! isQtyPlus) {
-		error.push('在庫数は正の整数を入力してください。');
-	}
+
+	if (! issetQty) error.push('在庫数が入力されていません。');
+	if (! isQtyNum) error.push('在庫数は半角数字で入力してください。');
+	if (! isQtyPlus) error.push('在庫数は正の整数を入力してください。');
+
 	return error;
 }
 
@@ -80,7 +70,7 @@ registerBtn.addEventListener('click', e => {
 	}
 	let error = new Array;
 	error = validateProduct(error);
-	if (! error.length == 0) {
+	if (error.length > 0) {
 		showError(error, divRegister);
 		registerBtn.disabled = false;
 	} else {
@@ -97,7 +87,7 @@ updateBtn.addEventListener('click', e => {
 	}
 	let error = new Array;
 	error = validateUpdatedProduct(error);
-	if (! error.length == 0) {
+	if (error.length > 0) {
 		showError(error, divUpdate);
 		updateBtn.disabled = false;
 	} else {

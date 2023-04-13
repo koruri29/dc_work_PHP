@@ -10,7 +10,7 @@ function validateQty(error) {
 	let numFlag = true;
 	let plusFlag = true;
 	for (let i = 0; i < qtyInput.length; i++) {
-		if (deleteInput[i] == '') {
+		if (! deleteInput[i].checked) {
 			if (qtyInput[i].value == '') {
 				issetFlag = false;
 			}
@@ -21,7 +21,6 @@ function validateQty(error) {
 				plusFlag = false;
 			}
 		}
-
 	}
 	if (! issetFlag) error.push('数量が入力されていません。')
 	if (! numFlag) error.push('数量は半角数字で入力してください。')
@@ -40,13 +39,14 @@ qtyChangeBtn.addEventListener('click', e => {
 	if (error.length > 0) {
 		showError(error, div);
 	} else {
-		document.form1.submit();
+		// document.form1.submit();
 	}
 });
 
-
-purchaseBtn.addEventListener('click', e => {
-	e.preventDefault();
-	purchaseBtn.disabled = true;
-	document.form2.submit();
-});
+if (document.getElementById('purchase') != null) {
+	purchaseBtn.addEventListener('click', e => {
+		e.preventDefault();
+		purchaseBtn.disabled = true;
+		document.form2.submit();
+	});
+}

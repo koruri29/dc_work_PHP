@@ -220,7 +220,7 @@ function showPublicProduct(object $stmt): void {
         print '<tr><th>在庫数：</th><td>' . $product['qty'] . '点</td></tr>';
         print '</table>';
         print '<img src="../../0006/images/' . $product['image_name'] . '">';
-        if ($product['qty'] == 0) {
+        if ($product['qty'] <= 0) {
             print '<p class="sold-out">売り切れ</p>';
         } else {
             print '<form class="cart-in-form" name="cartInForm" action="./product.php" method="post">';
@@ -270,7 +270,7 @@ function showProductInCart(object $pdo): void {
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';
-        print '<tr><th>数量：</th><td><input class="qty" class="qty" type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
+        print '<tr><th>数量：</th><td><input class="qty" type="number" name="qty' . $i . '" value="' . $product['qty'] . '">点</td></tr>';
         print '<tr><th>小計：</th><td>' . $product['price'] * $product['qty'] . '円</td></tr>';
         print '<tr><th>削除</th><td><input class="delete" type="checkbox" name="delete' . $i . '"></td></tr>';
         print '</table>';
@@ -285,15 +285,10 @@ function showProductInCart(object $pdo): void {
 
 
 function doesShowPurchaseButton(object $pdo): bool {
-    global $product_num;
+    if (countProductInCart($pdo) === 0) return false;
     $stmt = fetchAllInCart($pdo);
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        if ($product['qty'] == 0) {
-            return false;
-        }
-    }
-    for ($i =0; $i < $product_num; $i++) {
-        if (isset($error['stock' . $i])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
+        if ($product['qty'] <= 0) {
             return false;
         }
     }
@@ -305,20 +300,21 @@ function doesShowPurchaseButton(object $pdo): bool {
  * カート内の商品の数量変更の関数
  * 
  * @param object $pdo
+ * @param int $id 商品ID
+ * @param int $input_qty 変更したい商品数量
  * @return void
  */
-function changeQtyInCart(object $pdo, int $id): void {
-    for ($i = 0; $i < $_POST['product-num']; $i++) {
+function changeQtyInCart(object $pdo, int $id, int $input_qty): void {
+    // for ($i = 0; $i < $_POST['product-num']; $i++) {
         $rec = fetchOneInCart($pdo, $id);
         $current_qty = $rec['qty'];
 
-        if ($_POST['qty' . $i] == $current_qty) {  
-            //
+        if ($input_qty == $current_qty || $current_qty == 0) {  
         } else {
-            $qty = getNewQty($pdo, $_POST['product-id' . $i], $_POST['qty' . $i]);
-            updateQty($pdo, $_POST['product-id' . $i], $qty);
+            $qty = getNewQty($pdo, $id, $input_qty);
+            updateQty($pdo, $id, $qty);
         }
-    }
+    // }
 }
 
 /**
@@ -447,7 +443,7 @@ function doesExistInCart(object $pdo): bool {
 */
 function validateQty($qty): bool {
     global $error;
-    global $product_num;
+
     $pattern = '/^[0-9]*[\.][0-9]*/';
 
         if ($qty === '') {

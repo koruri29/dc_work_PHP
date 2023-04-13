@@ -53,7 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     if (empty($error)) {
-        changeQtyInCart($db, $_POST['product-id' . $i]);
+        for ($i = 0; $i < $_POST['product-num']; $i++) {
+            changeQtyInCart($db, $_POST['product-id' . $i], $_POST['qty' . $i]);
+        }
     }
 }
 
@@ -76,6 +78,11 @@ if ($stmt->fetch(PDO::FETCH_ASSOC)) {
 
 //購入ボタンを表示するか
 $show_purchase_btn = doesShowPurchaseButton($db);
+for ($i = 0; $i < $product_num; $i++) {
+    if (isset($error['stock' . $i])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
+        $show_purchase_btn = false;
+    }
+}
 
 
 include_once ('../../include/view/ec_head.html');
