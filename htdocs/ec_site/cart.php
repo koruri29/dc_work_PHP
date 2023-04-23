@@ -60,8 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 
-//カート内の商品が売り切れたときのエラー表示
+//売り切れおよび在庫不足の際のエラー表示
 isStockAvailable($db);
+whichStockIsntEnough($db);
 
 
 //合計金額の計算
@@ -77,7 +78,10 @@ if ($stmt->fetch(PDO::FETCH_ASSOC)) {
 }
 
 //購入ボタンを表示するか
-$show_purchase_btn = doesShowPurchaseButton($db);
+$show_purchase_btn = true;
+if (! isStockEnough($db) || ! doesShowPurchaseButton($db)) {
+    $show_purchase_btn = false;
+}
 for ($i = 0; $i < $product_num; $i++) {
     if (isset($error['stock' . $i])) {//カート内商品が売り切れていたら、購入ボタンを表示しない
         $show_purchase_btn = false;

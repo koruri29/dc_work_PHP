@@ -42,6 +42,10 @@ $msg = '';
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (! isStockEnough($db)) {
+        header('Location: cart.php');
+        exit();
+    }
     $stmt = fetchAllInCart($db);
     proceedSales($db, $stmt);
     $stmt = getSales($db);

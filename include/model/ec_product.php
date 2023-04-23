@@ -284,6 +284,12 @@ function showProductInCart(object $pdo): void {
 }
 
 
+/**
+ * カート内の商品の数量が0以下の場合、falseを返す
+ * 
+ * @param object $pdo
+ * @return bool
+ */
 function doesShowPurchaseButton(object $pdo): bool {
     if (countProductInCart($pdo) === 0) return false;
     $stmt = fetchAllInCart($pdo);
@@ -305,16 +311,15 @@ function doesShowPurchaseButton(object $pdo): bool {
  * @return void
  */
 function changeQtyInCart(object $pdo, int $id, int $input_qty): void {
-    // for ($i = 0; $i < $_POST['product-num']; $i++) {
-        $rec = fetchOneInCart($pdo, $id);
-        $current_qty = $rec['qty'];
+    $rec = fetchOneInCart($pdo, $id);
+    $current_qty = $rec['qty'];
 
-        if ($input_qty == $current_qty || $current_qty == 0) {  
-        } else {
-            $qty = getNewQty($pdo, $id, $input_qty);
-            updateQty($pdo, $id, $qty);
-        }
-    // }
+    if ($input_qty == $current_qty) { 
+        // 
+    } else {
+        $qty = getNewQty($pdo, $id, $input_qty);
+        updateQty($pdo, $id, $qty);
+    }
 }
 
 /**
@@ -363,6 +368,9 @@ function getNewQty(object $pdo, int $id, $posted_qty = null): int {
     } else {
         $changed_qty = $current_qty + 1;
     }
+    if ($max_qty <= 0) {
+        $changed_qty = 0;
+    }
     return $changed_qty;
 }
 
@@ -404,6 +412,28 @@ function calcTotal(object $pdo, callable $func): int {
     }
     return $total;
 }
+
+
+/**
+ * 在庫数がカート内の商品数を下回っていないかをチェック
+ * 
+ * @param object $pdo
+ * @return void
+ */
+function whichStockIsntEnough(object $pdo): void {
+    global $error;
+    $i = 0;
+    $stmt = fetchAllInCart($pdo);
+    while ($product_cart = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $product_stock = fetchOneFromProduct($pdo, $product_cart['product_id']);
+        if ($product_stock['qty'] < $product_cart['qty'] && $product_stock['qty'] >= 1) {
+            $error = array_merge($error, ['not_enough_stock' . $i => 'カート内の' . $product_stock['product_name'] . 'の在庫が不足しています。']); 
+        }
+        $i++;
+    }
+}
+
+
 /**
  * 商品一覧画面から「カートに入れる」を押した場合の関数
  * 
@@ -469,6 +499,26 @@ function validateQty($qty): bool {
 /*-------------------------
  * thankyou.php
  *-------------------------*/
+/**
+ * 在庫数がカート内の商品数を下回っていないかをチェック
+ * 
+ * @param object $pdo
+ * @return bool 在庫数が足りない場合、falseを返す
+ */
+function isStockEnough(object $pdo): bool {
+    $i = 0;
+    $stmt = fetchAllInCart($pdo);
+    while ($product_cart = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $product_stock = fetchOneFromProduct($pdo, $product_cart['product_id']);
+        if ($product_stock['qty'] < $product_cart['qty']) {
+            return false;
+        }
+        $i++;
+    }
+    return true;
+}
+
+
 /**
  * 商品決済を進める関数
  * 
