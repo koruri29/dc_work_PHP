@@ -353,15 +353,22 @@ function updateFlag(object $pdo, int $id): void {
  */
 function deleteProduct(object $pdo, int $id): void {
     global $msg_update;
-    $sql = 'DELETE FROM EC_product WHERE product_id = :id;';
+    $sql_image = 'DELETE FROM EC_image WHERE image_id = :id;';
+    $sql_product = 'DELETE FROM EC_product WHERE product_id = :id;';
+
+    $product = fetchOneFromProduct($pdo, $id);    
 
     try {
         $pdo->beginTransaction();
 
-        $stmt = $pdo->prepare($sql);
+        $stmt = $pdo->prepare($sql_product);
         $stmt->bindValue(':id', $id);
         $stmt->execute();
-        
+
+        $stmt = $pdo->prepare($sql_image);
+        $stmt->bindValue(':id', $product['image_id']);
+        $stmt->execute();
+
         $pdo->commit();
 
         if ($stmt->rowCount() > 0) {            

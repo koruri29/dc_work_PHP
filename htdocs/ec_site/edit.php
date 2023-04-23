@@ -39,12 +39,15 @@ $msg_update = array();
 $product_num = countAllProduct($db);
 $stmt = fetchAllProduct($db);
 
-var_dump($_POST);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['register'])) {
         registerProduct($db);
+        $product_num = countAllProduct($db);
+        $stmt = fetchAllProduct($db);
     } else if (isset($_POST['update'])) {
         proceedUpdateProduct($db);
+        $product_num = countAllProduct($db);
+        $stmt = fetchAllProduct($db);
     } else {
         $stmt = searchResult($db);
         $product_num = countSearchResult($db);
