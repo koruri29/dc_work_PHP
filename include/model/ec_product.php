@@ -9,8 +9,7 @@
  * @param object $pdo
  * @return void
  */
-function showProductData(object $pdo): void {
-    $stmt = fetchAllProduct($pdo);
+function showProductData(object $pdo, object $stmt): void {
     $i = 0;
 
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {

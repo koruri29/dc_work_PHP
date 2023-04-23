@@ -839,13 +839,14 @@ function getSales(object $pdo): object {
  * SEARCH
  *-------------------------*/
 /**
- * 公開中商品のAND検索機能
+ * 商品の検索機能
  * 
  * @param object $pdo
- * @param array $words 検索ワードを配列化したもの
  * @return object|null $stmt 検索結果のデータ
  */
-function andSearch(object $pdo, array $words) {
+function searchResult(object $pdo) {
+    $words = adjustSearchWords();
+
     $arr = array();
     $arr[] = <<<SQL
         SELECT *
@@ -854,46 +855,16 @@ function andSearch(object $pdo, array $words) {
         ON p.image_id = i.image_id
         WHERE public_flag = 1 AND product_name LIKE 
     SQL;
-    for ($i = 0; $i < count($words); $i++) {
-        $arr[] = '?';
-        $arr[] = ' AND product_name LIKE ';
-    }
-    $arr[count($words) * 2] = '';//最後のANDを削除
-    $sql = implode('', $arr);
-    if (empty($words)) $sql = 'SELECT * FROM EC_product WHERE 1 = 0;';
-
-    $stmt = $pdo->prepare($sql);
-    if (! empty ($words)) {
-        $i = 1;
-        foreach ($words as $word) {
-            $stmt->bindValue($i, '%' . $word . '%');
-            $i++;
+    if ($_POST['and-or'] == 'and') {
+        for ($i = 0; $i < count($words); $i++) {
+            $arr[] = '?';
+            $arr[] = ' AND product_name LIKE ';
         }
-    }
-    $stmt->execute();
-
-    return $stmt;
-}
-
-/**
- * 公開中商品のOR検索機能
- * 
- * @param object $pdo
- * @param array $words 検索ワードを配列化したもの
- * @return object|null $stmt 検索結果のデータ
- */
-function orSearch(object $pdo, array $words) {
-    $arr = array();
-    $arr[] = <<<SQL
-        SELECT *
-        FROM EC_product p
-        LEFT JOIN EC_image i
-        ON p.image_id = i.image_id
-        WHERE public_flag = 1 AND product_name LIKE 
-    SQL;
-    for ($i = 0; $i < count($words); $i++) {
-        $arr[] = '?';
-        $arr[] = ' OR product_name LIKE ';
+    } else {
+        for ($i = 0; $i < count($words); $i++) {
+            $arr[] = '?';
+            $arr[] = ' OR product_name LIKE ';
+        }
     }
     $arr[count($words) * 2] = '';//最後のORを削除
 
@@ -911,6 +882,50 @@ function orSearch(object $pdo, array $words) {
     $stmt->execute();
 
     return $stmt;
+}
+/** 
+ * 商品検索結果の個数をカウントする
+ * 
+ * @param object $pdo
+ * @return int 検索結果の個数
+ */
+function countSearchResult(object $pdo): int {
+    $words = adjustSearchWords();
+    if (empty($words)) return 0;
+
+    $arr = array();
+    $arr[] = <<<SQL
+        SELECT COUNT(*) AS cnt
+        FROM EC_product p
+        LEFT JOIN EC_image i
+        ON p.image_id = i.image_id
+        WHERE public_flag = 1 AND product_name LIKE 
+    SQL;
+    if ($_POST['and-or'] == 'and') {
+        for ($i = 0; $i < count($words); $i++) {
+            $arr[] = '?';
+            $arr[] = ' AND product_name LIKE ';
+        }
+    } else {
+        for ($i = 0; $i < count($words); $i++) {
+            $arr[] = '?';
+            $arr[] = ' OR product_name LIKE ';
+        }
+    }
+
+    $arr[count($words) * 2] = '';//最後のORを削除
+    $sql = implode('', $arr);
+
+    $stmt = $pdo->prepare($sql);
+    $i = 1;
+    foreach ($words as $word) {
+        $stmt->bindValue($i, '%' . $word . '%');
+        $i++;
+    }
+    $stmt->execute();
+
+    $cnt = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $cnt['cnt'];
 }
 
 

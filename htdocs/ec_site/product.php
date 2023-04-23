@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($_POST['cart-in'] == 'on'){
         addToCart($db);
     } else {//検索
-        $products = searchProduct($db);
+        $products = searchResult($db);
     }
 }
 

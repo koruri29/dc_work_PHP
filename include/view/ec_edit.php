@@ -1,4 +1,5 @@
 <body>
+    <?php if (isset($_POST['search'])) print '<a href="./edit.php">商品一覧を表示する</a>';?>
     <h2 class="h2">商品登録</h2>
     <?php if (! empty($msg_register)) print '<p class="msg">' . $msg_register . '</p>'; ?>
 
@@ -10,7 +11,7 @@
         公開<input class="public-flag" type="radio" name="public_flag" value="1" checked>
         非公開<input class="public-flag" type="radio" name="public_flag" value="0"><br>
         画像ファイル<input class="image" type="file" name="image"><br>
-        <input type="hidden" name="register">
+        <input type="hidden" name="register" value="register">
         <div id="register-error">
             <?php
                 if (! empty($error_register)) {
@@ -20,7 +21,7 @@
                 }
             ?>
         </div>
-        <input id="register-product" type="submit" value="登録">
+        <button id="register-product" type="submit">登録</button>
     </form>
     <div id="update-error">
         <?php
@@ -39,9 +40,10 @@
         ?>
     </div>
     <form id="update" name ="update" action="./edit.php" method="post">
-        <?php showProductData($db); ?>
+        <?php showProductData($db, $stmt); ?>
         <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
-        <input id="update-product" name="send" type="submit" value="設定を変更する">
+        <input type="hidden" name="update" value="update">
+        <button id="update-product" type="submit">設定を変更する</button>
     </form>
 	<script src="../../0006/js/edit.js"></script>
 	<script src="../../0006/js/search.js"></script>

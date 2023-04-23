@@ -155,23 +155,16 @@ function checkAuthToken(object $pdo) {
  * SEARCH
  *-------------------------*/
 /**
- * 検索機能をまとめた関数
+ * 検索窓に入力された文字列を整形する
  * 
- * @param object $pdo
- * @return object $stmt 検索結果
+ * @return array 検索ワードをスペースで区切って配列化
  */
-function searchProduct(object $pdo): object {
-    //文字列を整える
+function adjustSearchWords(): array {
     if (empty($_POST['search'])) {
         $words = array();
     } else {
         $hankaku = mb_convert_kana($_POST['search'], 's', 'utf-8');
         $words = preg_split('/[\s]/', $hankaku);
     }
-
-    if ($_POST['and-or'] == 'and') {
-        return andSearch($pdo, $words);
-    } else {
-        return orSearch($pdo, $words);
-    }
+    return $words;
 }
