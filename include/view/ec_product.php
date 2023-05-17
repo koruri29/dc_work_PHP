@@ -21,7 +21,9 @@
                 }
             }
         ?>
-        <?php showPublicProduct($products); ?>
+        <div class="content">
+            <?php showPublicProduct($products); ?>
+        </div>
     <?php endif; ?>
     <script src="../../0006/js/search.js"></script>
 	<script src="../../0006/js/product.js"></script>    

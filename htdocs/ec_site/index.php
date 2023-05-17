@@ -47,9 +47,6 @@ if (isLogin($db)) {
 }
 
 
-
-
-
 include_once ('../../include/view/ec_head.html');
 include_once ('../../include/view/ec_head_index.html');
 include_once ('../../include/view/ec_header.php');

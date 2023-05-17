@@ -6,16 +6,16 @@
 /**
  * 商品管理画面で商品データを一覧表示する
  * 
- * @param object $pdo
+ * @param object $stmt 商品一覧のデータ
  * @return void
  */
-function showProductData(object $pdo, object $stmt): void {
+function showProductData(object $stmt): void {
     $i = 0;
 
     while ($product = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $product = sanitize($product);
 
-        print '<div class="item">';
+        print '<div class="item edit-item">';
         print '<table>';
         print '<tr><th>商品ID：</th><td>' . $product['product_id'] . '</td></tr>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
@@ -212,7 +212,7 @@ function showPublicProduct(object $stmt): void {
         $flag = true;
         $product = sanitize($product);
 
-        print '<div class="item">';
+        print '<div class="item brows-item">';
         print '<table>';
         print '<tr><th>商品名：</th><td>' . $product['product_name'] . '</td></tr>';
         print '<tr><th>価格：</th><td>' . $product['price'] . '円</td></tr>';

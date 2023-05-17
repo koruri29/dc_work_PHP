@@ -21,8 +21,7 @@
                 }
             ?>
         </div>
-        <input id="update-product" name="send" type="submit" value="登録">
-        <!-- <button id="register-product" name="register" value="register" type="submit">登録</button> -->
+        <input id="register-product" name="send" type="submit" value="登録">
     </form>
     <div id="update-error">
         <?php
@@ -45,7 +44,6 @@
         <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
         <input type="hidden" name="update" value="update">
         <input id="update-product" name="send" type="submit" value="設定を変更する">
-        <!-- <button id="update-product" name="update" value="update" type="submit">設定を変更する</button> -->
     </form>
 	<script src="../../0006/js/edit.js"></script>
 	<script src="../../0006/js/search.js"></script>
