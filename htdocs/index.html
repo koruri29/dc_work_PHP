@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+	<title>Koruri Araki's Portfolio</title>
+</head>
+<body>
+	<header class="header">
+		<div class="container clearfix">
+			<div class="header-left">
+				<h1>Koruri Araki's Portfolio</h1>
+			</div>
+			<div class="hamburger">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+			<nav class="global-nav">
+				<ul>
+					<li class="nav-item"><a href="#self-intro">自己紹介</a></li>
+					<li class="nav-item"><a href="#sample">実装サンプル</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<main class="main">
+		<div id="self-intro" class="self-intro">
+			<h2 class="heading2">自己紹介<br><span class="h2-en">Self Introduction</span></h2>
+			<div class="text">
+				<p><span class="bold">荒木小瑠璃</span>と申します。2022年10月より、就労移行支援事業所ディーキャリアで訓練に励んでおります。</p>
+				<p>ディーキャリアでは、プログラミングの学習に加え、基本情報技術者試験の取得を目指すなどITの知識を学ぶとともに、カリキュラムを通して自己理解やキャリアへの意識を深めてまいりました。</p>
+				<p>どうぞよろしくお願いいたします。</p>
+			</div>
+			<img class="image" src="./images/img01.jpg" alt="tree">
+		</div>
+		<div class="flexbox">
+			<div class="skills">
+				<h3 class="heading3">スキル<span class="h3-en">Skills</span></h3>
+				<ul>
+					<li class="skill-item">HTML/CSS</li>
+					<li class="skill-item">JavaScript</li>
+					<li class="skill-item">PHP</li>
+					<li class="skill-item">Laravel</li>
+					<li class="skill-item">MySQL</li>
+					<li class="skill-item">WordPress</li>
+					<li class="skill-item">Linux</li>
+				</ul>
+			</div>
+			<div class="tools">
+				<h3 class="heading3">ツール<span class="h3-en">Tools</span></h3>
+				<ul>
+					<li class="tool-item">Github</li>
+					<li class="tool-item">Visual Studio Code</li>
+					<li class="tool-item">Sourcetree</li>
+					<li class="tool-item">Slack</li>
+					<li class="tool-item">FileZilla</li>
+					<li class="tool-item">Redmine</li>
+				</ul>
+			</div>
+		</div>
+		<div id="sample" class="sample">
+			<h2 class="heading2">実装サンプル<br><span class="h2-en">Sample</span></h2>
+			<h3 class="heading3-2">画像ギャラリー</h3>
+			<div class="gallery">
+				<div class="gallery-item">
+					<img src="images/gallery01.jpg" alt="宇宙飛行士と月">
+					<h4 class="title">宇宙飛行士と月</h4>
+					<p class="desc">幻想的な色彩の月と雲の前に、宇宙飛行士が立っています。</p>
+				</div>
+				<div class="gallery-item">
+					<img src="images/gallery02.jpg" alt="朝日と石">
+					<h4 class="title">朝日と石</h4>
+					<p class="desc">積み重ねられた石を、朝日が照らしています。</p>
+				</div>
+				<div class="gallery-item">
+					<img src="images/gallery03.jpg" alt="鏡のような湖">
+					<h4 class="title">鏡のような湖</h4>
+					<p class="desc">空と海がどちらかわからなくなるような、鏡のような湖です。</p>
+				</div>
+				<div class="gallery-item">
+					<img src="images/gallery04.jpg" alt="ハートの風船">
+					<h4 class="title">ハートの風船</h4>
+					<p class="desc">青空をバックに、たくさんの色とりどりのハートの風船が浮いています。</p>
+				</div>
+			</div>
+		</div>
+		<div class="output">
+			<h3 class="heading3-2">訓練課題</h3>
+			<div class="output-item">
+				<h4 class="title">JavaScript</h4>
+				<a href="https://portfolio.dc-itex.com/omiya/0006/js/" target="_blank" rel="noopener noreferrer">
+					<img class="output-img" src="./images/JavaScript_piano.png" alt="JavaScript制作物">
+				</a>
+				<p class="desc">JavaScriptによるピアノアプリ。繰り返し処理や関数化を用いて簡潔で読みやすいコードになるよう努めた。</p>
+				<p class="desc">苦労した点：曲を演奏する機能を作る際、長さの異なる音を続けて鳴らす挙動をどのように実装しようか悩んだ。setIntervalを用い、繰り返し処理でIDを配列に格納することで自動演奏の完遂と中断機能を両立させた。</p>
+			</div>
+			<div class="output-item">
+				<h4 class="title">PHP/MySQL</h4>
+				<a href="https://portfolio.dc-itex.com/omiya/0006/ec_site/index.php" target="_blank" rel="noopener noreferrer">
+					<img class="output-img" src="./images/PHP_ECsite.png" alt="PHP/MySQL制作物">
+				</a>
+				<p class="desc">PHPとMySQLを用いたECサイト。商品の登録や編集、一覧表示機能、自動ログインなどを実装。MVCモデルに沿って作業を進めた。</p>
+				<p class="desc">苦労した点：自動ログインにセッションとクッキーを用いたが、実行の順番によって無効になってしまう場合があったため、ログイン判断やログイン時のカート作成処理などと同時に作用させることに苦労した。</p>
+			</div>
+			<div class="output-item">
+				<h4 class="title">WordPress</h4>
+				<a href="https://portfolio.dc-itex.com/omiya/0006/wp/" target="_blank" rel="noopener noreferrer">
+					<img class="output-img" src="./images/WordPress_HP.png" alt="WordPress制作物">
+				</a>
+				<p class="desc">WordPressによるホームページ。</p>
+				<p class="desc">苦労した点：サブカテゴリーを設定した際にURLのカテゴリー認識がおかしくなってしまい、function.phpに関数を追加することで解決した。簡易に使えるCMSであっても、使いこなすためにはプログラミングの知識が必須なのだと感じた。</p>
+			</div>
+		</div>
+	</main>
+	<footer class="footer">
+		<p class="copyright">Copyright © 2023 Koruri Araki</p>
+	</footer>
+	<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+	<script>
+		//スムーススクロール
+		const smoothScrollTrigger = document.querySelectorAll('a[href^="#"]');
+		for (let i = 0; i < smoothScrollTrigger.length; i++) {
+			smoothScrollTrigger[i].addEventListener('click', e => {
+				e.preventDefault();
+				let href = smoothScrollTrigger[i].getAttribute('href');
+				let targetElement = document.getElementById(href.replace('#', ''));
+
+				const rect = targetElement.getBoundingClientRect().top;
+				const offset = window.pageYOffset;
+				const gap = 80;
+				const target = rect + offset - gap;
+
+				window.scrollTo({
+					top: target,
+					behavior: 'smooth',
+				});
+			});
+		}
+
+		//ハンバーガーメニュー（SP）
+		if (window.innerWidth <= 768) {
+			const nav = document.getElementsByClassName('nav-sp')[0];
+			$('.hamburger').on('click', () => {
+				$('.nav').toggleClass('nav-sp-show');
+				$('.hamburger').toggleClass('active');
+				$('.global-nav').fadeToggle('0.5s');
+			});
+			$('.global-nav').on('click', () => {
+				$('.nav').toggleClass('nav-sp-show');
+				$('.hamburger').toggleClass('active');
+				$('.global-nav').fadeToggle('fast');
+			});
+		}
+
+	</script>
+</body>
+</html>

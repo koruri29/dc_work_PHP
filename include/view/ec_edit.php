@@ -40,7 +40,7 @@
         ?>
     </div>
     <form id="update" name ="update" action="./edit.php" method="post">
-        <?php showProductData($db, $stmt); ?>
+        <?php showProductData($stmt); ?>
         <input type="hidden" name="product-num" value="<?php print $product_num; ?>">
         <input type="hidden" name="update" value="update">
         <input id="update-product" name="send" type="submit" value="設定を変更する">

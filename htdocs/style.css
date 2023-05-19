@@ -1,0 +1,434 @@
+@charset "utf-8";
+
+html {
+	font-size: 16px;
+}
+body {
+	margin: 0 auto;
+	color: #000;
+	font-size: 100%;
+	font-family: "Noto Sans JP";
+	letter-spacing: 0.05em;
+}
+* {
+	margin: 0;
+}
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+.clearfix::after {
+	content: "";
+	display: block;
+	clear: both;
+}
+a {
+ text-decoration: none;
+}
+h1, h2, h3, h4, p, ul {
+	margin-block-start: 0;
+	margin-block-end: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	padding-inline-start: 0;
+}
+
+/*-------------------------
+ * header
+ *-------------------------*/
+
+.header {
+	height: 40vh;
+	background: url("images/main.jpg") no-repeat;
+	background-size: cover;
+	color: #FFF;
+}
+.container {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 80px;
+	background: #000000CB;
+	z-index: 10000;
+}
+.header-left {
+	float: left;
+	margin-left: 20px;
+	font-size: 26px;
+	font-weight: bold;
+	line-height: 80px;
+	text-align: left;
+	vertical-align: middle;
+}
+.header-left h1:first-letter {
+ color: #A6ACFF;
+}
+.global-nav {
+	float: right;
+}
+.global-nav ul {
+	display: table;
+	line-height: 80px;
+	vertical-align: middle;
+	list-style-type: none;
+}
+.nav-item {
+	display: table-cell;
+}
+.nav-item a {
+	display: block;
+	margin: auto 20px;
+	color: #FFF;
+}
+
+/*-------------------------
+ * main
+ *-------------------------*/
+
+.main {
+	width: 1024px;
+	max-width: 90vw;
+	margin: 80px auto;
+}
+
+/*-------------------------
+ * self-intro
+ *-------------------------*/
+
+.self-intro {
+	margin: 80px auto 40px;
+}
+.heading2 {
+	color: #4B52A7;
+	font-size: 24px;
+	font-weight: bold;
+	text-align: center;
+}
+.h2-en {
+	display: block;
+	font-size: 14px;
+}
+.self-intro .text {
+	width: 600px;
+	margin: 40px auto 30px;
+	line-height: 32px;	
+}
+.bold {
+	font-weight: bold;
+}
+.self-intro .image {
+	display: block;
+	width: 600px;
+	margin: 30px auto 40px;
+}
+.skills, .tools {
+	width: 48%;
+	margin: 0 30px;
+	max-width: 650px;
+	padding: 20px 10px;
+	border-radius: 10px;
+	background: #8AB3DC;
+}
+.heading3 {
+	padding: 20px auto 0;
+	color: #FFF;
+	text-align: center;
+}
+.h3-en {
+	display: block;
+	font-size: 12px;
+	margin-bottom: 20px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #FFF;
+}
+.flexbox {
+	display: flex;
+	justify-content: center;
+}
+.flexbox ul {
+	margin-left: 20px;
+	list-style: inside;
+}
+.flexbox ul li {
+	line-height: 30px;
+	font-weight: bold;
+}
+.skill-item {
+	color: #FEFFC7
+}
+.tool-item {
+	color: #FFE8F6;
+}
+
+/*-------------------------
+ * gallery
+ *-------------------------*/
+
+.sample {
+	margin: 80px auto;
+}
+.sample .h2-en {
+	display: block;
+	margin-bottom: 80px;
+}
+.heading3-2 {
+	margin-bottom: 40px;
+	padding-bottom: 3px;
+	color: #32839C;
+	font-weight: bold;
+	text-align: center;
+	line-height: 24px;
+	border-bottom: 1px solid #b7b7b7;
+}
+.gallery {
+	display: flex;
+	margin: 40px auto;
+}
+.gallery-item {
+	flex: auto;
+	width: 25%;
+	font-size: 0;
+}
+.gallery-item img,
+.gallery-item h4,
+.gallery-item .desc {
+	width: 90%;
+	margin: 0 auto;
+}
+.gallery img {
+	display: block;
+}
+.title {
+	color: #FFF;
+	text-align: center;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 20px;
+	background-color: #758BAF;
+}
+.desc {
+	margin-top: 4px;
+	font-size: 12px;
+	line-height: 17px;
+}
+
+/*-------------------------
+ * output
+ *-------------------------*/
+
+.output-item {
+	width: 600px;
+	margin: 40px auto;
+}
+.output-item .title {
+	padding: 8px;
+}
+.output-img {
+	width: 100%;
+}
+.output-img:hover {
+	opacity: 0.6;
+}
+.contact {
+	margin: 80px auto;
+}
+ dl {
+	width: 600px;
+	max-width: 90vw;
+	margin: 0 auto;
+}
+dt {
+	margin-bottom: 10px;
+}
+dd {
+	margin-bottom: 20px;
+}
+input, textarea {
+	width: 600px;
+	height: 40px;
+	border-radius: 10px;
+	border-width: 1px;
+}
+.required {
+	display: inline-block;
+	height: 24px;
+	margin-right: 10px;
+	padding: 3px 8px 4px 8px;
+	font-size: 12px;
+	text-align: center;
+	vertical-align: middle;
+	color: #FFF;
+	background-color: #32839C;
+	border-radius: 4px;
+}
+input, textarea {
+	border-color: #B7B7B7;
+}
+.btn {
+	display: block;
+	width: 300px;
+	height: 40px;
+	margin: 40px auto 80px;
+	background-color: #8AB3DC;
+	color: #FFF;
+	border: none;
+	border-radius: 4px;
+	box-shadow: 0 4px 0 #818694;
+}
+
+/*-------------------------
+ * contact
+ *-------------------------*/
+
+.footer {
+	width: 100%;
+	height: 120px;
+	padding-top: 20px;
+	background-color: #8AB3DC;
+	color: #FFF;
+	line-height: 24px;
+	text-align: center;
+}
+.copyright{
+	padding: 20px auto auto;
+}
+
+/*-------------------------
+ * @media
+ *-------------------------*/
+
+@media (max-width: 768px) {
+
+	.header {
+		background: url("images/main_sp.jpg") no-repeat;
+		background-position: 55% 60%;
+		height:100vh;
+	}
+	.container {
+		height: 48px;
+	}
+	h1 {
+		line-height: 48px;
+		font-size: 20px;
+		vertical-align: middle;
+	}
+
+	.nav-pc {
+		display: none;
+	}
+	.hamburger{
+		width: 40px;
+		height: 23px;
+		position: relative;
+		position: fixed;
+		top: 11px;
+		right: 16px
+	}
+	.hamburger span{
+		position: absolute;
+		width: 100%;
+		height: 2px;
+		background-color: #FFF;
+		transition: all .4s;
+	}
+	.hamburger span:first-of-type{/* ハンバーガーメニューの1番目の線 */
+		top: 0;
+	}
+	.hamburger span:nth-of-type(2){/* ハンバーガーメニューの2番目の線 */
+		top: 50%;
+	}
+	.hamburger span:last-of-type{/* ハンバーガーメニューの3番目の線 */
+		top: 100%;
+	}
+	.hamburger.active span:nth-child(1) {
+		top: 2px;
+		transform: translateY(500%) rotate(-45deg);
+	}
+	.hamburger.active span:nth-child(2) {
+		opacity: 0;
+	}
+	.hamburger.active span:nth-child(3) {
+		top: 13px;
+		transform: translateY(2%) rotate(45deg);
+	}
+
+	.global-nav {
+		display: none;
+		background-color: rgba(0, 0, 0, 0.4);
+		position: absolute;
+		top: 48px;
+		width: 100%;
+		justify-content: center;
+		align-content: center;
+		transition: 0.5s;
+	}
+	.nav-sp-show {
+		display: block;
+	}
+	.global-nav ul {
+		margin: 0 auto;
+	}
+	.nav-item {
+		display: block;
+		text-align: center;
+	}
+	.nav-item a {
+		margin: auto;
+	}
+	.main {
+		max-width: 90vw;
+		margin: 80px auto;
+	}
+	.heading2 {
+		font-size: 20px;
+	}
+	.h2-en {
+		font-size: 12px;
+	}
+	.self-intro .text {
+		width: 100%;
+		margin-bottom: 25px;
+		font-size: 14px;
+	}
+	.self-intro .image {
+		width: 100%;
+		margin-top: 25px;
+		height: auto;	
+	}
+	.flexbox {
+		display: block;
+	}
+	.tools, .skills {
+		width: 100%;
+		margin: 0 auto 10px;
+		padding: 15px auto 20px 30px;
+	}
+	.gallery {
+		display: block;
+		width: 100%;
+		margin: 40px auto;
+	}
+	.gallery-item {
+		width: 80%;
+		margin: 20px auto;
+	}
+	.gallery-item img, 
+	.gallery-item .title, 
+	.gallery-item .desc {
+		width: 100%;
+	}
+	input, textarea {
+		width: 100%;
+	}
+	.output {
+		width: 100%;
+	}
+	.output-item {
+		width: 100%;
+	}
+	.footer {
+		width: 100%;
+	}
+}
