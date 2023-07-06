@@ -6,3 +6,7 @@
 * サンプルサイト：https://portfolio.dc-itex.com/omiya/0006/ec_site/index.php
 * Basic認証ユーザー名：user
 * Basic認証パスワード：sK8weEG/
+* ログインユーザー名：test123
+* ログインパスワード：password
+* 管理者ユーザー名：ec_admin
+* 管理者パスワード：ec_admin
