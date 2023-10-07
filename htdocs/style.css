@@ -118,10 +118,57 @@ h1, h2, h3, h4, p, ul {
 .bold {
 	font-weight: bold;
 }
-.self-intro .image {
+.interests {
+	margin-bottom: 80px;
+}
+.pie {
+	position: relative;
+	margin-right: auto;
+	margin-left: auto;
+	width: 300px;
+	height: 300px;
+	background-image: conic-gradient(#4B52A7 0% 50%, #4ba65a 50% 75%, #ffff73 75% 90%, #ff6347 90% 100%);
+	border-radius: 50%;
+}
+.pie span {
+	position: absolute;
+	transform: translateY(-50%);
+	color: #d3d3d3;
+	font-size: 26px;
+	font-weight: 700;
+}
+.pie-cats {
+	top: 138px;
+	right: 26px;
+}
+.pie-programming {
+	top: 213px;
+	right: 128px;
+	text-align: center;
+}
+.pie .pie-english {
+	top: 109px;
+	right: 189px;
+	color: #c8c8c8;
+	text-align: center;
+}
+.pie-radio {
+	top: 36px;
+	right: 144px;
+	text-align: center;
+}
+i.fa-solid.fa-radio {
 	display: block;
-	width: 600px;
-	margin: 30px auto 40px;
+}
+.interests-text {
+	width: 40%;
+	margin-top: 32px;
+}
+.interests-text p span {
+	margin-left: -16px;
+	color: #4B52A7;
+	font-size: 24px;
+	font-weight: bold;
 }
 .skills, .tools {
 	width: 48%;
@@ -230,6 +277,12 @@ h1, h2, h3, h4, p, ul {
 }
 .output-img:hover {
 	opacity: 0.6;
+}
+.desc p a {
+	font-weight: bold;
+}
+.desc ul {
+	margin-left: 17px;
 }
 .contact {
 	margin: 80px auto;
@@ -392,10 +445,9 @@ input, textarea {
 		margin-bottom: 25px;
 		font-size: 14px;
 	}
-	.self-intro .image {
-		width: 100%;
-		margin-top: 25px;
-		height: auto;	
+	.pie-programming {
+		top: 66%;
+		right: 42%;
 	}
 	.flexbox {
 		display: block;
