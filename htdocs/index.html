@@ -29,9 +29,10 @@
 		<div id="self-intro" class="self-intro">
 			<h2 class="heading2">自己紹介<br><span class="h2-en">Self Introduction</span></h2>
 			<div class="text">
-				<p><span class="bold">荒木小瑠璃</span>と申します。2022年10月より、就労移行支援事業所ディーキャリアで訓練に励んでおります。</p>
-				<p>ディーキャリアでは、プログラミングの学習に加え、基本情報技術者試験の取得を目指すなどITの知識を学ぶとともに、カリキュラムを通して自己理解やキャリアへの意識を深めてまいりました。</p>
+				<p><span class="bold">荒木小瑠璃</span>と申します。1992年生まれで、埼玉県在住です。2022年10月より、民間の職業訓練所に入所し訓練に励んでおります。</p>
+				<p>職業訓練では、プログラミングの学習に加え、基本情報技術者試験の取得を目指すなどITの知識を学ぶとともに、カリキュラムを通して自己理解やキャリアへの意識を深めてまいりました。</p>
 				<p>どうぞよろしくお願いいたします。</p>
+				<a href="https://booklog.jp/users/06907e9c37973d16" target="_blank" rel="noopener noreferrer">&raquo;最近読んだ本はこちら（ブクログへ移動）</a>
 			</div>
 			<img class="image" src="./images/img01.jpg" alt="tree">
 		</div>
@@ -46,6 +47,8 @@
 					<li class="skill-item">MySQL</li>
 					<li class="skill-item">WordPress</li>
 					<li class="skill-item">Linux</li>
+					<li class="skill-item">Git</li>
+					<li class="skill-item">Docker</li>
 				</ul>
 			</div>
 			<div class="tools">
@@ -65,52 +68,117 @@
 			<h3 class="heading3-2">画像ギャラリー</h3>
 			<div class="gallery">
 				<div class="gallery-item">
-					<img src="images/gallery01.jpg" alt="宇宙飛行士と月">
-					<h4 class="title">宇宙飛行士と月</h4>
-					<p class="desc">幻想的な色彩の月と雲の前に、宇宙飛行士が立っています。</p>
+					<img src="./images/nekos.jpg" alt="2匹の猫">
+					<h4 class="title">猫たち</h4>
+					<p class="desc">うちの猫2匹が、太陰太極図のように寝転がっています。</p>
 				</div>
 				<div class="gallery-item">
-					<img src="images/gallery02.jpg" alt="朝日と石">
-					<h4 class="title">朝日と石</h4>
-					<p class="desc">積み重ねられた石を、朝日が照らしています。</p>
+					<img src="./images/furakan.jpg" alt="CDとスマホ">
+					<h4 class="title">フラワーカンパニーズ</h4>
+					<p class="desc">最推しのバンドのステッカーを入れたスマートフォンとCDです。</p>
 				</div>
 				<div class="gallery-item">
-					<img src="images/gallery03.jpg" alt="鏡のような湖">
-					<h4 class="title">鏡のような湖</h4>
-					<p class="desc">空と海がどちらかわからなくなるような、鏡のような湖です。</p>
+					<img src="./images/desk.jpg" alt="猫の大判ポストカード">
+					<h4 class="title">デスクまわり</h4>
+					<p class="desc">デスクまわりの写真です。猫の大判ポストカードが置かれています。</p>
 				</div>
 				<div class="gallery-item">
-					<img src="images/gallery04.jpg" alt="ハートの風船">
-					<h4 class="title">ハートの風船</h4>
-					<p class="desc">青空をバックに、たくさんの色とりどりのハートの風船が浮いています。</p>
+					<img src="./images/park.jpg" alt="木々と湖">
+					<h4 class="title">公園の木と湖</h4>
+					<p class="desc">ときどき行く公園です。木々と青空が湖を取り囲んでいます。</p>
 				</div>
 			</div>
 		</div>
 		<div class="output">
 			<h3 class="heading3-2">訓練課題</h3>
 			<div class="output-item">
-				<h4 class="title">JavaScript</h4>
-				<a href="https://portfolio.dc-itex.com/omiya/0006/js/" target="_blank" rel="noopener noreferrer">
-					<img class="output-img" src="./images/JavaScript_piano.png" alt="JavaScript制作物">
+				<h4 class="title">Laravelつぶやきアプリ</h4>
+				<a href="https://laravel-sample-tweet-app-ec9bf8738663.herokuapp.com/" target="_blank" rel="noopener noreferrer">
+					<img class="output-img" src="./images/Laravel10_tweet_app.png" alt="Laravelつぶやきアプリ">
 				</a>
-				<p class="desc">JavaScriptによるピアノアプリ。繰り返し処理や関数化を用いて簡潔で読みやすいコードになるよう努めた。</p>
-				<p class="desc">苦労した点：曲を演奏する機能を作る際、長さの異なる音を続けて鳴らす挙動をどのように実装しようか悩んだ。setIntervalを用い、繰り返し処理でIDを配列に格納することで自動演奏の完遂と中断機能を両立させた。</p>
+				<div class="desc">
+					<p>
+						Laravel入門本を終え、復習のため作成したアプリ。（制作時間：25h・約7日
+						<a href="https://github.com/koruri29/Laravel10_tweet_app/tree/main" target="_blank" rel="noopener noreferrer">Githubレポジトリ</a></p>
+						）
+					<p>仕様：</p>
+					<ul>
+						<li>つぶやきのCRUD機能を備えている。</li>
+						<li>Laravelの機能により、以下が実現されている。</li>
+						<li style="list-style: none;"><ul><li>バリデーション、ログイン認証、ページネーション</li></ul></li>
+						<li>ミドルウェアを使用する（今回はauth）。</li>
+						<li>データ操作はORM（eloquent）を使用する。</li>
+					</ul>
+					<br>
+					<p>感想：コーディング自体はそこまで詰まらずに進められたものの、パッケージのインストールやHerokuへのデプロイに時間がかかってしまい、まだまだ勉強することが沢山あると思った。行き詰ったときには、解説サイトを見て概要をつかみつつ公式のドキュメントを読んで対処するようにした。</p>
+				</div>
 			</div>
 			<div class="output-item">
 				<h4 class="title">PHP/MySQL</h4>
 				<a href="https://portfolio.dc-itex.com/omiya/0006/ec_site/index.php" target="_blank" rel="noopener noreferrer">
 					<img class="output-img" src="./images/PHP_ECsite.png" alt="PHP/MySQL制作物">
 				</a>
-				<p class="desc">PHPとMySQLを用いたECサイト。商品の登録や編集、一覧表示機能、自動ログインなどを実装。MVCモデルに沿って作業を進めた。</p>
-				<p class="desc">苦労した点：自動ログインにセッションとクッキーを用いたが、実行の順番によって無効になってしまう場合があったため、ログイン判断やログイン時のカート作成処理などと同時に作用させることに苦労した。</p>
+				<div class="desc">
+					<p>
+						PHPとMySQLを用いたECサイト。（制作時間：75h・約1カ月
+						<a href="https://github.com/koruri29/dc_work_PHP" target="_blank" rel="noopener noreferrer">Githubレポジトリ</a>
+						）
+					</p>
+					<p>仕様：</p>
+					<ul>
+						<li>管理ユーザー名：ec_admin、パスワード：ec_admin</li>
+						<li>全6ページからなる。（ログイン、ユーザー登録、商品管理、商品一覧、カート、購入完了）</li>
+						<li>MVCモデルを使用している。</li>
+						<li>バリデーションはフロントエンド・バックエンド双方で行う。</li>
+						<li>XSS、SQLインジェクションに配慮した実装である。</li>
+						<li>ヘッダー等の共通化して使用できる画面パーツについては、PHPでテンプレート化を行う。</li>
+					</ul>
+				</div>
+			</div>
+			<div class="output-item">
+				<h4 class="title">JavaScript</h4>
+				<a href="https://portfolio.dc-itex.com/omiya/0006/js/" target="_blank" rel="noopener noreferrer">
+					<img class="output-img" src="./images/JavaScript_piano.png" alt="JavaScript制作物">
+				</a>
+				<div class="desc">
+					<p>
+						JavaScriptによるピアノアプリ。（制作時間：16h・約4日
+						<a href="https://github.com/koruri29/dc_work_omiya_araki_JavaScript" target="_blank" rel="noopener noreferrer">Githubレポジトリ</a>
+						）
+					</p>
+					<p>仕様：</p>
+					<ul>
+						<li>
+							手動演奏機能
+							<ul>
+								<li>「ドレミファソラシ」の7つの鍵盤がある。鍵盤を押すと音が鳴り、音名が表示される。</li>
+							</ul>
+						</li>
+						<li>
+							自動演奏機能
+							<ul>
+								<li>「自動演奏」ボタンをクリックすると、「きらきら星」「チューリップの歌」の2曲のどちらかがランダムに演奏される。</li>
+								<li>「自動演奏」ボタンをクリックすると、ボタンの表示が「演奏中止」に変わる。その状態で押すと、自動演奏が止まる。</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
 			</div>
 			<div class="output-item">
 				<h4 class="title">WordPress</h4>
 				<a href="https://portfolio.dc-itex.com/omiya/0006/wp/" target="_blank" rel="noopener noreferrer">
 					<img class="output-img" src="./images/WordPress_HP.png" alt="WordPress制作物">
 				</a>
-				<p class="desc">WordPressによるホームページ。</p>
-				<p class="desc">苦労した点：サブカテゴリーを設定した際にURLのカテゴリー認識がおかしくなってしまい、function.phpに関数を追加することで解決した。簡易に使えるCMSであっても、使いこなすためにはプログラミングの知識が必須なのだと感じた。</p>
+				<div class="desc">
+					<p>WordPressによるホームページ。（制作時間：10h・約5日）</p>
+					<ul>
+						<li>静的なHTMLファイルからテーマファイルを作成。</li>
+						<li>固定ページと投稿ページを持ったWordPressサイトを構築。</li>
+						<li>プラグインを使用し、パンくずリスト・ページネーションを実装。</li>
+					</ul>
+					<br>
+					<p>苦労した点：サブカテゴリーを設定した際にURLのカテゴリー認識がおかしくなってしまい、function.phpに関数を追加することで解決した。簡易に使えるCMSであっても、使いこなすためにはプログラミングの知識が必須なのだと感じた。</p>
+				</div>
 			</div>
 		</div>
 	</main>
